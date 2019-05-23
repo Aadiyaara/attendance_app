@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 //Components
 import './components/pedestal/interface.dart';
 
+//Tests
+import './components/student/student.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -69,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      body: PedestalInterface(),
+      body: StudentUI(),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Info',
