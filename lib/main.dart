@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+//Temporary
+import 'workflow/pages/main_page.dart';
+import 'workflow/pages/ui/login_page.dart';
+import 'workflow/pages/ui/mark_att.dart';
+
+
 //Components
 import './components/pedestal/interface.dart';
 
@@ -26,7 +32,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: LoginPage(),
+//      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      routes: {
+        '/main':(BuildContext context)=>MainPage(),
+        '/mark':(BuildContext context)=>Mark(),
+      },
     );
   }
 }

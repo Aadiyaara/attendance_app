@@ -18,7 +18,6 @@ class MyApp extends StatelessWidget
       routes: {
         '/main':(BuildContext context)=>MainPage(),
         '/mark':(BuildContext context)=>Mark(),
-        
       },
     );
   }
