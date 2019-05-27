@@ -15,10 +15,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+  with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _loginkey = new GlobalKey<FormState>();
-  final GlobalKey<FormState> _signupkey = new GlobalKey<FormState>();
+  final GlobalKey<FormState> _sig nupkey = new GlobalKey<FormState>();
   String _emailValue;
   String _passwordValue;
   String _name;
