@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import 'shop_items_page.dart';
 
 class MainPage extends StatefulWidget
 {
@@ -24,17 +23,13 @@ class _MainPageState extends State<MainPage>
   int actualChart = 0;
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Scaffold
-    (
-      appBar: AppBar
-      (
+  Widget build(BuildContext context) {
+    return Scaffold (
+      appBar: AppBar (
         elevation: 2.0,
         backgroundColor: Colors.white,
         title: Text('Attendance Manager', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 30.0)),
-        actions: <Widget>
-        [
+        actions: <Widget> [
          
         ],
       ),
@@ -44,27 +39,21 @@ class _MainPageState extends State<MainPage>
         mainAxisSpacing: 12.0,
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
         children: <Widget>[
-          Container
-          (
+          Container (
             margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
-            child: Material
-            (
+            child: Material (
               elevation: 8.0,
               color: Colors.black,
               borderRadius: BorderRadius.circular(32.0),
-              child: InkWell
-              (
+              child: InkWell (
                 onTap: ()=>Navigator.pushReplacementNamed(context, '/create'),
-                child: Padding
-                (
+                child: Padding (
                   padding: EdgeInsets.all(12.0),
-                  child: Row
-                  (
+                  child: Row (
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>
-                    [
+                    children: <Widget> [
                       Icon(Icons.add, color: Colors.white),
                       Padding(padding: EdgeInsets.only(right: 16.0)),
                       Text('ADD A COURSE', style: TextStyle(color: Colors.white))
@@ -74,39 +63,27 @@ class _MainPageState extends State<MainPage>
               ),
             )
           ),
-          
-         
-         
-          
+
           _buildTile(
-            Padding
-            (
+            Padding (
               padding: const EdgeInsets.all(24.0),
-              child: Row
-              (
+              child: Row (
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>
-                [
-                  Column
-                  (
+                children: <Widget> [
+                  Column (
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>
-                    [
-                     
+                    children: <Widget> [
                       Text('UTA002', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
-                       Text('Mechanics', style: TextStyle(color: Colors.redAccent)),
+                      Text('Mechanics', style: TextStyle(color: Colors.redAccent)),
                     ],
                   ),
-                  Material
-                  (
+                  Material (
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(24.0),
-                    child: Center
-                    (
-                      child: Padding
-                      (
+                    child: Center (
+                      child: Padding (
                         padding: EdgeInsets.all(16.0),
                         child: Icon(Icons.add, color: Colors.white, size: 30.0),
                       )
@@ -132,8 +109,7 @@ class _MainPageState extends State<MainPage>
       elevation: 14.0,
       borderRadius: BorderRadius.circular(12.0),
       shadowColor: Color(0x802196F3),
-      child: InkWell
-      (
+      child: InkWell (
         // Do onTap() if it isn't null, otherwise do print()
         onTap: onTap != null ? () => onTap() : () { print('Not set yet'); },
         child: child

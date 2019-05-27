@@ -7,6 +7,10 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
+// Models
+import '../../../models/Teacher.dart';
+import '../../../models/Student.dart';
+
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,15 +25,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _loginkey = new GlobalKey<FormState>();
   final GlobalKey<FormState> _signupkey = new GlobalKey<FormState>();
-  String _emailValue;
-  String _passwordValue;
-  String _name;
-  String __emailValue;
-  String __passwordValue;
+  bool matchingPassword = false;
+
+  Teacher teacher;
+  Student student;
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
-
   final FocusNode myFocusNodePassword = FocusNode();
   final FocusNode myFocusNodeEmail = FocusNode();
   final FocusNode myFocusNodeName = FocusNode();
@@ -56,12 +58,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-
-    final HttpLink httpLink = HttpLink(uri: 'https://attendanceappbackend.herokuapp.com/graphql');
-
-    final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>{
-      GraphQLClient(link: httpLink as Link, cache: )
-    }
 
     return new Scaffold(
       key: _scaffoldKey,
@@ -136,6 +132,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     myFocusNodeEmail.dispose();
     myFocusNodeName.dispose();
     _pageController?.dispose();
+    loginEmailController.dispose();
+    loginPasswordController.dispose();
+    signupConfirmPasswordController.dispose();
+    signupPasswordController.dispose();
+    signupNameController.dispose();
+    signupEmailController.dispose();
     super.dispose();
   }
 
@@ -159,11 +161,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         value,
         textAlign: TextAlign.center,
         style: TextStyle(
-            color: Colors.white,
+            color: Colors.red,
             fontSize: 16.0,
             fontFamily: "WorkSansSemiBold"),
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.white,
       duration: Duration(seconds: 3),
     ));
   }
@@ -277,162 +279,160 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
     return Center(
         child: Container(
-      padding: EdgeInsets.only(top: 20.0),
-      child: Column(
-        children: <Widget>[
-          Stack(
-            alignment: Alignment.topCenter,
-            overflow: Overflow.visible,
-            children: <Widget>[
-              Card(
-                elevation: 2.0,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Container(
-                  width: 300.0,
-                  height: 190.0,
-                  child: Form(
-                    key: _loginkey,
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-                          child: TextFormField(
-                            onSaved: (String value) {
-                              __emailValue = value;
-                            },
-                            controller: loginEmailController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(
-                                fontFamily: "WorkSansSemiBold",
-                                fontSize: 16.0,
-                                color: Colors.black),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(
-                                FontAwesomeIcons.envelope,
-                                color: Colors.black,
-                                size: 22.0,
-                              ),
-                              hintText: "Email Address",
-                              hintStyle: TextStyle(
+        padding: EdgeInsets.only(top: 20.0),
+        child: Column(
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.topCenter,
+              overflow: Overflow.visible,
+              children: <Widget>[
+                Card(
+                  elevation: 2.0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Container(
+                    width: 300.0,
+                    height: 190.0,
+                    child: Form(
+                      key: _loginkey,
+                      child: Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            child: TextFormField(
+                              onEditingComplete: () {
+                                print('Change Done');
+                              },
+                              controller: loginEmailController,
+                              keyboardType: TextInputType.emailAddress,
+                              style: TextStyle(
                                   fontFamily: "WorkSansSemiBold",
-                                  fontSize: 17.0),
+                                  fontSize: 16.0,
+                                  color: Colors.black),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.envelope,
+                                  color: Colors.black,
+                                  size: 22.0,
+                                ),
+                                hintText: "Email Address",
+                                hintStyle: TextStyle(
+                                    fontFamily: "WorkSansSemiBold",
+                                    fontSize: 17.0),
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          width: 250.0,
-                          height: 1.0,
-                          color: Colors.grey[400],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
-                          child: TextFormField(
-                            onSaved: (String value) {
-                              __passwordValue = value;
-                            },
-                            focusNode: myFocusNodePasswordLogin,
-                            controller: loginPasswordController,
-                            obscureText: _obscureTextLogin,
-                            style: TextStyle(
-                                fontFamily: "WorkSansSemiBold",
-                                fontSize: 16.0,
-                                color: Colors.black),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(
-                                FontAwesomeIcons.lock,
-                                size: 22.0,
-                                color: Colors.black,
-                              ),
-                              hintText: "Password",
-                              hintStyle: TextStyle(
+                          Container(
+                            width: 250.0,
+                            height: 1.0,
+                            color: Colors.grey[400],
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            child: TextFormField(
+                              focusNode: myFocusNodePasswordLogin,
+                              controller: loginPasswordController,
+                              obscureText: _obscureTextLogin,
+                              style: TextStyle(
                                   fontFamily: "WorkSansSemiBold",
-                                  fontSize: 17.0),
-                              suffixIcon: GestureDetector(
-                                onTap: _toggleLogin,
-                                child: Icon(
-                                  FontAwesomeIcons.eye,
-                                  size: 15.0,
+                                  fontSize: 16.0,
+                                  color: Colors.black),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                icon: Icon(
+                                  FontAwesomeIcons.lock,
+                                  size: 22.0,
                                   color: Colors.black,
+                                ),
+                                hintText: "Password",
+                                hintStyle: TextStyle(
+                                    fontFamily: "WorkSansSemiBold",
+                                    fontSize: 17.0),
+                                suffixIcon: GestureDetector(
+                                  onTap: _toggleLogin,
+                                  child: Icon(
+                                    FontAwesomeIcons.eye,
+                                    size: 15.0,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 170.0),
-                decoration: new BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
-                      offset: Offset(1.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                    BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
-                      offset: Offset(1.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                  ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
-                ),
-                child: MaterialButton(
-                  highlightColor: Colors.transparent,
-                  splashColor: Theme.Colors.loginGradientEnd,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 42.0),
-                    child: Text(
-                      "LOGIN",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25.0,
-                          fontFamily: "WorkSansBold"),
-                    ),
+                Container(
+                  margin: EdgeInsets.only(top: 170.0),
+                  decoration: new BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: Theme.Colors.loginGradientStart,
+                        offset: Offset(1.0, 6.0),
+                        blurRadius: 20.0,
+                      ),
+                      BoxShadow(
+                        color: Theme.Colors.loginGradientEnd,
+                        offset: Offset(1.0, 6.0),
+                        blurRadius: 20.0,
+                      ),
+                    ],
+                    gradient: new LinearGradient(
+                        colors: [
+                          Theme.Colors.loginGradientEnd,
+                          Theme.Colors.loginGradientStart
+                        ],
+                        begin: const FractionalOffset(0.2, 0.2),
+                        end: const FractionalOffset(1.0, 1.0),
+                        stops: [0.0, 1.0],
+                        tileMode: TileMode.clamp),
                   ),
-                  onPressed: () => {_initSignup(context)},
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: FlatButton(
-                onPressed: () {},
-                child: Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontFamily: "WorkSansMedium"),
-                )),
-          ),
-        ],
-      ),
-    ));
+                  child: MaterialButton(
+                    highlightColor: Colors.transparent,
+                    splashColor: Theme.Colors.loginGradientEnd,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 42.0),
+                      child: Text(
+                        "LOGIN",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25.0,
+                            fontFamily: "WorkSansBold"),
+                      ),
+                    ),
+                    onPressed: () => {_initLogin(context)},
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: FlatButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontFamily: "WorkSansMedium"),
+                  )),
+            ),
+          ],
+        ),
+      )
+    );
   }
 
   Widget _buildSignUp(BuildContext context) {
@@ -461,12 +461,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           padding: EdgeInsets.only(
                               top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
                           child: TextFormField(
-                            onSaved: (String value) {
-                              _name = value;
-                            },
                             focusNode: myFocusNodeName,
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.words,
+                            controller: signupNameController,
                             style: TextStyle(
                                 fontFamily: "WorkSansSemiBold",
                                 fontSize: 16.0,
@@ -493,9 +491,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           padding: EdgeInsets.only(
                               top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
                           child: TextFormField(
-                            onSaved: (String value) {
-                              _emailValue = value;
-                            },
                             focusNode: myFocusNodeEmail,
                             controller: signupEmailController,
                             keyboardType: TextInputType.emailAddress,
@@ -525,9 +520,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           padding: EdgeInsets.only(
                               top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
                           child: TextFormField(
-                            onSaved: (String value) {
-                              _passwordValue = value;
-                            },
                             focusNode: myFocusNodePassword,
                             controller: signupPasswordController,
                             obscureText: _obscureTextSignup,
@@ -623,23 +615,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       stops: [0.0, 1.0],
                       tileMode: TileMode.clamp),
                 ),
-                child: MaterialButton(
-                  highlightColor: Colors.transparent,
-                  splashColor: Theme.Colors.loginGradientEnd,
-                  //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 42.0),
-                    child: Text(
-                      "SIGN UP",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25.0,
-                          fontFamily: "WorkSansBold"),
-                    ),
-                  ),
-                  onPressed: () => _initLogin(context),
-                ),
+                child: _initSignup(context)
               ),
             ],
           ),
@@ -648,19 +624,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
 
-  Future<Map<String, dynamic>> _submitForm() async {
-    _signupkey.currentState.save();
-    print(_emailValue);
-    Map<String, dynamic> user = {
-      'email': _emailValue,
-      'password': _passwordValue
-    };
-    http.Response response = await http.post(
-        'https://attendanceappbackend.herokuapp.com/graphql',
-        body: json.encode(user),
-        headers: {'Content-Type': 'application/json'});
-    print(response.body);
-  }
+//  Future<Map<String, dynamic>> _submitForm() async {
+//    _signupkey.currentState.save();
+//    print(_emailValue);
+//    Map<String, dynamic> user = {
+//      'email': _emailValue,
+//      'password': _passwordValue
+//    };
+//    http.Response response = await http.post(
+//        'https://attendanceappbackend.herokuapp.com/graphql',
+//        body: json.encode(user),
+//        headers: {'Content-Type': 'application/json'});
+//    print(response.body);
+//  }
 
   void _initLogin(context) {
     print("Here");
@@ -671,14 +647,74 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     }
   }
 
-  void _initSignup(context) {
+  Mutation _initSignup(context) {
+    print("test");
     if (this._mode == 'Teacher') {
-      Navigator.pushReplacementNamed(context, '/teacher');
+      return Mutation(
+        options: MutationOptions(document: """
+            mutation SignUpTeacher(\$name: String!, \$email: String!, \$password: String!){
+              createTeacher(teacherInput: {name: \$name, email: \$email, password: \$password}) {
+                name
+              }
+            }
+        """),
+        builder: (
+          RunMutation runMutation,
+          QueryResult result,
+        ){
+          return MaterialButton(
+            highlightColor: Colors.transparent,
+            splashColor: Theme.Colors.loginGradientEnd,
+            //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 10.0, horizontal: 42.0
+              ),
+              child: Text(
+                "SIGN UP",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25.0,
+                  fontFamily: "WorkSansBold"),
+              ),
+            ),
+            onPressed: () => signUp(runMutation)
+            );
+        },
+        onCompleted: (dynamic resultData) {
+          if(resultData == null) {
+            print(resultData);
+            showInSnackBar('User already Exists');
+          }
+          else {
+            final teacherName = resultData.data["createTeacher"]["name"];
+            print(teacherName);
+//            showInSnackBar(teacherName.toString());
+
+            Navigator.pushReplacementNamed(context, '/teacher');
+          }
+        },
+      );
     } else {
       Navigator.pushReplacementNamed(context, '/student');
     }
-  }
 
+    }
+  
+  void signUp (runMutation) {
+    print(signupNameController.text);
+    if(signupPasswordController.text == signupConfirmPasswordController.text) {
+      runMutation({
+        "name": signupNameController.text,
+        "email": signupEmailController.text,
+        "password": signupPasswordController.text,
+      });
+    }
+    else {
+      showInSnackBar("Passwords do not match");
+    }
+  }
+    
   void _onSignInButtonPress() {
     _pageController.animateToPage(0,
         duration: Duration(milliseconds: 500), curve: Curves.decelerate);
