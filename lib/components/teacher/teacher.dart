@@ -15,17 +15,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+// Shared Preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Teacher extends StatefulWidget
-{
+
+class Teacher extends StatefulWidget {
   @override
   _TeacherState createState() => _TeacherState();
 }
 
-class _TeacherState extends State<Teacher>
-{
-  final List<List<double>> charts =
-  [
+class _TeacherState extends State<Teacher> {
+  final List<List<double>> charts = [
     [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4],
     [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4,],
     [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4]
@@ -34,6 +34,11 @@ class _TeacherState extends State<Teacher>
   static final List<String> chartDropdownItems = [ 'Last 7 days', 'Last month', 'Last year' ];
   String actualDropdown = chartDropdownItems[0];
   int actualChart = 0;
+
+  Future<String> getTeacher (String arg) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.getString(arg);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +75,30 @@ class _TeacherState extends State<Teacher>
                           Icon(Icons.add, color: Colors.white),
                           Padding(padding: EdgeInsets.only(right: 16.0)),
                           Text('ADD A COURSE', style: TextStyle(color: Colors.white))
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+            ),
+            Container (
+                margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
+                child: Material (
+                  elevation: 8.0,
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(32.0),
+                  child: InkWell (
+                    onTap: ()=>Navigator.pushReplacementNamed(context, '/createSess'),
+                    child: Padding (
+                      padding: EdgeInsets.all(12.0),
+                      child: Row (
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget> [
+                          Icon(Icons.add, color: Colors.white),
+                          Padding(padding: EdgeInsets.only(right: 16.0)),
+                          Text('START A SESSION', style: TextStyle(color: Colors.white))
                         ],
                       ),
                     ),

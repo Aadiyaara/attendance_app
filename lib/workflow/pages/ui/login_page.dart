@@ -7,6 +7,15 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
+// Scoped Model
+import 'package:scoped_model/scoped_model.dart';
+
+// App Model
+import '../../../models/AppModel.dart';
+
+//Shared Preferences
+import 'package:shared_preferences/shared_preferences.dart';
+
 // Models
 import '../../../models/Teacher.dart';
 import '../../../models/Student.dart';
@@ -30,6 +39,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   Teacher teacher;
   Student student;
 
+  bool invalidDialogAllowed = true;
+
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
   final FocusNode myFocusNodePassword = FocusNode();
@@ -40,6 +51,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   TextEditingController loginPasswordController = new TextEditingController();
 
   String _mode = "Teacher";
+
+  bool loggedIn = false;
 
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
@@ -58,73 +71,73 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
-      key: _scaffoldKey,
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowGlow();
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height >= 775.0
-                ? MediaQuery.of(context).size.height
-                : 775.0,
-            decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Theme.Colors.loginGradientStart,
-                    Theme.Colors.loginGradientEnd
+          key: _scaffoldKey,
+          body: NotificationListener<OverscrollIndicatorNotification>(
+            onNotification: (overscroll) {
+              overscroll.disallowGlow();
+            },
+            child: SingleChildScrollView(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height >= 775.0
+                    ? MediaQuery.of(context).size.height
+                    : 775.0,
+                decoration: new BoxDecoration(
+                  gradient: new LinearGradient(
+                      colors: [
+                        Theme.Colors.loginGradientStart,
+                        Theme.Colors.loginGradientEnd
+                      ],
+                      begin: const FractionalOffset(0.0, 0.0),
+                      end: const FractionalOffset(1.0, 1.0),
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.clamp),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: _buildMenuBar(context),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (i) {
+                          if (i == 0) {
+                            setState(() {
+                              right = Colors.white;
+                              left = Colors.black;
+                            });
+                          } else if (i == 1) {
+                            setState(() {
+                              right = Colors.black;
+                              left = Colors.white;
+                            });
+                          }
+                        },
+                        children: <Widget>[
+                          new ConstrainedBox(
+                            constraints: const BoxConstraints.expand(),
+                            child: _buildSignIn(context),
+                          ),
+                          new ConstrainedBox(
+                            constraints: const BoxConstraints.expand(),
+                            child: _buildSignUp(context),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(1.0, 1.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: _buildMenuBar(context),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (i) {
-                      if (i == 0) {
-                        setState(() {
-                          right = Colors.white;
-                          left = Colors.black;
-                        });
-                      } else if (i == 1) {
-                        setState(() {
-                          right = Colors.black;
-                          left = Colors.white;
-                        });
-                      }
-                    },
-                    children: <Widget>[
-                      new ConstrainedBox(
-                        constraints: const BoxConstraints.expand(),
-                        child: _buildSignIn(context),
-                      ),
-                      new ConstrainedBox(
-                        constraints: const BoxConstraints.expand(),
-                        child: _buildSignUp(context),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
+
 
   @override
   void dispose() {
@@ -168,6 +181,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       backgroundColor: Colors.white,
       duration: Duration(seconds: 3),
     ));
+  }
+
+  Future setTeacher(String token, String id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString('token', token);
+    preferences.setString('userId', id);
   }
 
   Widget _buildMenuBar(BuildContext context) {
@@ -227,7 +246,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             borderRadius: BorderRadius.all(Radius.circular(25.0)),
           ),
           child: CustomPaint(
-            painter: TabIndicationPainter(pageController: _pageController),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -269,13 +287,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildSignIn(BuildContext context) {
-    Future<Map<String, dynamic>> Login(String email, String password) async {
-      Map<String, dynamic> user = {'email': email, 'password': password};
-      final http.Response response = await http.post(
-          'https://attendanceappbackend.herokuapp.com/graphql',
-          body: json.encode(user),
-          headers: {'Content-Type': 'application/json'});
-    }
+//    Future<Map<String, dynamic>> Login(String email, String password) async {
+//      Map<String, dynamic> user = {'email': email, 'password': password};
+//      final http.Response response = await http.post(
+//          'https://attendanceappbackend.herokuapp.com/graphql',
+//          body: json.encode(user),
+//          headers: {'Content-Type': 'application/json'});
+//    }
 
     return Center(
         child: Container(
@@ -303,9 +321,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             padding: EdgeInsets.only(
                                 top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
                             child: TextFormField(
-                              onEditingComplete: () {
-                                print('Change Done');
-                              },
                               controller: loginEmailController,
                               keyboardType: TextInputType.emailAddress,
                               style: TextStyle(
@@ -395,24 +410,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         stops: [0.0, 1.0],
                         tileMode: TileMode.clamp),
                   ),
-                  child: MaterialButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
-                      child: Text(
-                        "LOGIN",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25.0,
-                            fontFamily: "WorkSansBold"),
-                      ),
-                    ),
-                    onPressed: () => {_initLogin(context)},
-                  ),
+                  child: _initLogIn(context),
                 )
               ],
             ),
@@ -638,17 +636,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 //    print(response.body);
 //  }
 
-  void _initLogin(context) {
-    print("Here");
-    if (this._mode == 'Teacher') {
-      Navigator.pushReplacementNamed(context, '/teacher');
-    } else {
-      Navigator.pushReplacementNamed(context, '/student');
-    }
-  }
-
   Mutation _initSignup(context) {
-    print("test");
     if (this._mode == 'Teacher') {
       return Mutation(
         options: MutationOptions(document: """
@@ -690,7 +678,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             final teacherName = resultData.data["createTeacher"]["name"];
             print(teacherName);
 //            showInSnackBar(teacherName.toString());
-
             Navigator.pushReplacementNamed(context, '/teacher');
           }
         },
@@ -698,9 +685,119 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     } else {
       Navigator.pushReplacementNamed(context, '/student');
     }
+  }
 
+  _initLogIn(context) {
+    if (this._mode == 'Teacher') {
+      return ScopedModelDescendant<AppModel>(
+          builder: (context, child, model) => Mutation(
+          options: MutationOptions(document: """
+              mutation loginTeacher(\$method: String!, \$password: String!){
+                loginTeacher(method: \$method, password: \$password) {
+                  userId
+                  token
+                }
+              }
+          """),
+          builder: (
+              RunMutation runMutation,
+              QueryResult result,
+              ){
+            return MaterialButton(
+                highlightColor: Colors.transparent,
+                splashColor: Theme.Colors.loginGradientEnd,
+                //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 42.0
+                  ),
+                  child: Text(
+                    "LOG IN",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25.0,
+                        fontFamily: "WorkSansBold"),
+                  ),
+                ),
+                onPressed: () => logIn(runMutation)
+            );
+          },
+          onCompleted: (dynamic resultData) {
+            if(resultData != null) {
+              print(resultData.data);
+              model.setToken(resultData.data["loginTeacher"]["token"]);
+              model.setId(resultData.data["loginTeacher"]["userId"]);
+              Navigator.pushReplacementNamed(context, '/teacher');
+            }
+            else {
+              showInSnackBar("Invalid Credentials");
+            }
+          },
+        )
+      );
+    } else {
+      return ScopedModelDescendant<AppModel>(
+        builder: (context, child, model) => Mutation(
+          options: MutationOptions(document: """
+            mutation loginStudent(\$method: String!, \$password: String!){
+              loginStudent(method: \$method, password: \$password) {
+                userId
+                token
+              }
+            }
+        """),
+          builder: (
+              RunMutation runMutation,
+              QueryResult result,
+              ){
+            return MaterialButton(
+              highlightColor: Colors.transparent,
+              splashColor: Theme.Colors.loginGradientEnd,
+              //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 42.0
+                ),
+                child: Text(
+                  "LOG IN",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25.0,
+                      fontFamily: "WorkSansBold"),
+                ),
+              ),
+              onPressed: () => logIn(runMutation)
+            );
+          },
+          onCompleted: (dynamic resultData) {
+            if(resultData != null) {
+              print(resultData.data);
+              model.setToken(resultData.data["loginStudent"]["token"]);
+              model.setId(resultData.data["loginStudent"]["userId"]);
+              Navigator.pushReplacementNamed(context, '/student');
+            }
+            else {
+              showInSnackBar("Invalid Credentials");
+            }
+          },
+        )
+      );
     }
-  
+  }
+
+  void logIn (runMutation) {
+//    if(_mode == 'Student') {
+//      Navigator.pushReplacementNamed(context, '/student');
+//    }
+//    else {
+      print(loginEmailController.text);
+      runMutation({
+        "method": loginEmailController.text,
+        "password": loginPasswordController.text,
+      });
+//    }
+  }
+
   void signUp (runMutation) {
     print(signupNameController.text);
     if(signupPasswordController.text == signupConfirmPasswordController.text) {
@@ -726,34 +823,30 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   void _onTeacherButtonPress() {
-    setState(() {
-      _mode = "Teacher";
-    });
+    _mode = "Teacher";
     print(this._mode);
   }
 
   void _onStudentButtonPress() {
-    setState(() {
-      _mode = "Student";
-    });
+    _mode = "Student";
     print(this._mode);
   }
 
   void _toggleLogin() {
-    setState(() {
-      _obscureTextLogin = !_obscureTextLogin;
-    });
+//    setState(() {
+//      _obscureTextLogin = !_obscureTextLogin;
+//    });
   }
 
   void _toggleSignup() {
-    setState(() {
-      _obscureTextSignup = !_obscureTextSignup;
-    });
+//    setState(() {
+//      _obscureTextSignup = !_obscureTextSignup;
+//    });
   }
 
   void _toggleSignupConfirm() {
-    setState(() {
-      _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
-    });
+//    setState(() {
+//      _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
+//    });
   }
 }

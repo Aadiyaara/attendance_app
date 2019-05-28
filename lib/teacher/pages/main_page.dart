@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+// ScopedModel
+import 'package:scoped_model/scoped_model.dart';
 
-class MainPage extends StatefulWidget
-{
+//App Model
+import '../../models/AppModel.dart';
+
+class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -30,11 +34,11 @@ class _MainPageState extends State<MainPage>
         backgroundColor: Colors.white,
         title: Text('Attendance Manager', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 30.0)),
         actions: <Widget> [
-         
+
         ],
       ),
       body: StaggeredGridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: 4,
         crossAxisSpacing: 12.0,
         mainAxisSpacing: 12.0,
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
@@ -46,7 +50,7 @@ class _MainPageState extends State<MainPage>
               color: Colors.black,
               borderRadius: BorderRadius.circular(32.0),
               child: InkWell (
-                onTap: ()=>Navigator.pushReplacementNamed(context, '/create'),
+                onTap: () => Navigator.pushNamed(context, '/create'),
                 child: Padding (
                   padding: EdgeInsets.all(12.0),
                   child: Row (
@@ -56,7 +60,31 @@ class _MainPageState extends State<MainPage>
                     children: <Widget> [
                       Icon(Icons.add, color: Colors.white),
                       Padding(padding: EdgeInsets.only(right: 16.0)),
-                      Text('ADD A COURSE', style: TextStyle(color: Colors.white))
+                      Text('ADD A COURS', style: TextStyle(color: Colors.white))
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ),
+          Container (
+            margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
+            child: Material (
+              elevation: 8.0,
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(32.0),
+              child: InkWell (
+                onTap: () => Navigator.pushNamed(context, '/createSess'),
+                child: Padding (
+                  padding: EdgeInsets.all(12.0),
+                  child: Row (
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget> [
+                      Icon(Icons.add, color: Colors.white),
+                      Padding(padding: EdgeInsets.only(right: 16.0)),
+                      Text('Start a Session', style: TextStyle(color: Colors.white))
                     ],
                   ),
                 ),
@@ -92,7 +120,6 @@ class _MainPageState extends State<MainPage>
                 ]
               ),
             ),
-            
           )
         ],
         staggeredTiles: [
