@@ -65,13 +65,13 @@ class _CreateCourseState extends State<CreateCourse> {
         if (resultData == null) {
           print(resultData);
         } else {
-          print (resultData.data);
+          print (resultData);
           showModalBottomSheet(context: context, builder: (builder) {
             return Container(
               height: 250,
               color: Colors.pink,
               child: Center(
-                child: Text("Code: ${resultData.data["createCourse"]["token"]}"),
+                child: Text("Code: ${resultData["createCourse"]["token"]}"),
               ),
             );
           });
@@ -158,7 +158,7 @@ class _CreateCourseState extends State<CreateCourse> {
                         createCourse(),
                         SizedBox(width: 2,height: 50,),
                         RaisedButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
                           child: Text('Go Back'),
                           color: Colors.blueAccent, //specify background color for the button here
                           colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light

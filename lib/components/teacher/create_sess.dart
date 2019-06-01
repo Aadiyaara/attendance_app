@@ -1,3 +1,4 @@
+//
 import 'package:flutter/material.dart';
 
 //GraphQL
@@ -22,29 +23,25 @@ class _CreateSessionState extends State<CreateSession> {
 
   String sessionName;
 
+  String token = "ABC";
+  int attendance = 10;
 
   TextEditingController sessionNameController = new TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
 //  Client client = GraphqlProvider.of(context).value;
-//
-//  /// to set the authorization header with an api token
+//  to set the authorization header with an api token
 //  client.apiToken = '<YOUR_JWT>';
 
   Mutation createSession() {
     return Mutation(
       options: MutationOptions(document: """
-            mutation createSession(\$name: String!){
-              createSession(name: \$name) {
-                sessionToken
-                attendance
-              }
-            }
-        """),
+        mutation createSession(\$name: String!){
+          createSession(name: \$name) {
+            sessionToken
+            attendance
+          }
+        }
+      """),
       builder: (
           RunMutation runMutation,
           QueryResult result,
@@ -59,108 +56,139 @@ class _CreateSessionState extends State<CreateSession> {
           padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
         );
       },
-      onCompleted: (dynamic resultData) {
+      onCompleted: (dynamic resultData) async {
         if (resultData == null) {
           print(resultData);
         } else {
-          print (resultData.data);
-          showModalBottomSheet(context: context, builder: (builder) {
-            return Container(
-              height: 250,
-              color: Colors.pink,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text("Code: ${resultData.data["createSession"]["sessionToken"]}"),
-                  Text("Attendance: ${resultData.data["createSession"]["attendance"]}"),
-                ],
-              ),
-            );
+          print (resultData["createSession"]["sessionToken"]);
+          setState((){
+            token = resultData["createSession"]["sessionToken"];
+            attendance = resultData["createSession"]["attendance"];
           });
+          keepAsking(sessionNameController.text);
         }
       },
     );
   }
 
-  void createNewSession (runMutation) {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      createNewSession(runMutation);
+  void keepAsking(String name) async{
+    await GraphQLProvider.of(context).value.query(QueryOptions(document: """
+      query teacherSession(\$name: String!){
+        teacherSession(name: \$name) {
+          attendance
+        }
+      }
+      """, variables: <String, dynamic> {
+        "name": name
+      }, pollInterval: 100, fetchPolicy: FetchPolicy.noCache)
+    ).then((res) => {
+      setState(() {
+        attendance = res.data["teacherSession"]["attendance"];
+      })
     });
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      keepAsking(name);
+    });
+  }
+
+  void createNewSession (runMutation) {
     runMutation({
       "name": sessionNameController.text
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return MaterialApp(
-        home: new Material(
-            child: new Container(
-                padding: const EdgeInsets.all(30.0),
-                color: Colors.white,
-                child: new Container(
-                  child: new Center(
-                      child: new Column(children: [
-                        new Padding(padding: EdgeInsets.only(top: 140.0)),
-                        new Text(
-                          'Session Details',
-                          style: new TextStyle(color: Colors.blue, fontSize: 25.0),
-                        ),
-                        new Padding(padding: EdgeInsets.only(top: 50.0)),
-                        new TextFormField(
-                          controller: sessionNameController,
-                          decoration: new InputDecoration(
-                            labelText: "Session name",
-                            fillColor: Colors.white,
-                            border: new OutlineInputBorder(
-                              borderRadius: new BorderRadius.circular(25.0),
-                              borderSide: new BorderSide(),
-                            ),
-                            //fillColor: Colors.green
-                          ),
-                          validator: (val) {
-                            if (val.length == 0) {
-                              return "Session cannot be empty";
-                            } else {
-                              return null;
-                            }
-                          },
-                          keyboardType: TextInputType.emailAddress,
-                          style: new TextStyle(
-                            fontFamily: "Poppins",
-                          ),
-                        ),
-                        new Padding(padding: EdgeInsets.only(top: 20.0)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            createSession(),
-                            SizedBox(width: 2,height: 50,),
-                            RaisedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text('Go Back'),
-                              color: Colors.blueAccent, //specify background color for the button here
-                              colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
-                              disabledColor: Colors.blueGrey, // specify color when the button is disabled
-                              highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
-                              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-                            )
-                          ],
-                        )
-                      ])),
-                )
-            )
-        )
-    );
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
+
+  final GlobalKey<ScaffoldState> _sessionScaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      key: _sessionScaffoldKey,
+        body: Container(
+//          padding: const EdgeInsets.all(30.0),
+          color: Colors.white,
+          child: Container(
+            child: Center(
+              child: Column(children: [
+                Text("Code: ${token}"),
+                Text("Attendance: ${attendance}"),
+                Padding(padding: EdgeInsets.only(top: 140.0)),
+                Text(
+                  'Session Details',
+                  style: new TextStyle(color: Colors.blue, fontSize: 25.0),
+                ),
+                Padding(padding: EdgeInsets.only(top: 50.0)),
+                TextFormField(
+                  controller: sessionNameController,
+                  decoration: new InputDecoration(
+                    labelText: "Session name",
+                    fillColor: Colors.white,
+                    border: new OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(25.0),
+                      borderSide: new BorderSide(),
+                    ),
+                    //fillColor: Colors.green
+                  ),
+                  validator: (val) {
+                    if (val.length == 0) {
+                      return "Session cannot be empty";
+                    } else {
+                      return null;
+                    }
+                  },
+                  keyboardType: TextInputType.emailAddress,
+                  style: new TextStyle(
+                    fontFamily: "Poppins",
+                  ),
+                ),
+                Padding(padding: EdgeInsets.only(top: 20.0)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    createSession(),
+                    SizedBox(width: 2,height: 50,),
+                    RaisedButton(
+                      onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
+                      child: Text('Go Back'),
+                      color: Colors.blueAccent, //specify background color for the button here
+                      colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
+                      disabledColor: Colors.blueGrey, // specify color when the button is disabled
+                      highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
+                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+                    )
+                  ],
+                ),
+                Container(
+                  height: 150,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.pink,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text("Code: ${token}"),
+                      Text("Attendance: ${attendance}"),
+                    ],
+                  ),
+                )
+              ]
+            )
+          ),
+        )
+      )
+    );
+  }
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     sessionNameController.dispose();
   }
-
 }

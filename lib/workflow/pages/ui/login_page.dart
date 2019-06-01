@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/Teacher.dart';
 import '../../../models/Student.dart';
 
+//GraphQL
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -47,9 +48,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final FocusNode myFocusNodeEmail = FocusNode();
   final FocusNode myFocusNodeName = FocusNode();
 
-  TextEditingController loginEmailController = new TextEditingController();
-  TextEditingController loginPasswordController = new TextEditingController();
-
   String _mode = "Teacher";
 
   bool loggedIn = false;
@@ -58,6 +56,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
 
+  TextEditingController loginEmailController = new TextEditingController();
+  TextEditingController loginPasswordController = new TextEditingController();
   TextEditingController signupEmailController = new TextEditingController();
   TextEditingController signupNameController = new TextEditingController();
   TextEditingController signupPasswordController = new TextEditingController();
@@ -245,41 +245,39 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             color: Color(0x552B2B2B),
             borderRadius: BorderRadius.all(Radius.circular(25.0)),
           ),
-          child: CustomPaint(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: FlatButton(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onPressed: _onTeacherButtonPress,
-                    child: Text(
-                      "Teacher",
-                      style: TextStyle(
-                          color: left,
-                          fontSize: 16.0,
-                          fontFamily: "WorkSansSemiBold"),
-                    ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onPressed: _onTeacherButtonPress,
+                  child: Text(
+                    "Teacher",
+                    style: TextStyle(
+                        color: left,
+                        fontSize: 16.0,
+                        fontFamily: "WorkSansSemiBold"),
                   ),
                 ),
-                //Container(height: 33.0, width: 1.0, color: Colors.white),
-                Expanded(
-                  child: FlatButton(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onPressed: _onStudentButtonPress,
-                    child: Text(
-                      "Student",
-                      style: TextStyle(
-                          color: right,
-                          fontSize: 16.0,
-                          fontFamily: "WorkSansSemiBold"),
-                    ),
+              ),
+              //Container(height: 33.0, width: 1.0, color: Colors.white),
+              Expanded(
+                child: FlatButton(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  onPressed: _onStudentButtonPress,
+                  child: Text(
+                    "Student",
+                    style: TextStyle(
+                        color: right,
+                        fontSize: 16.0,
+                        fontFamily: "WorkSansSemiBold"),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
@@ -636,97 +634,152 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 //    print(response.body);
 //  }
 
-  Mutation _initSignup(context) {
-    if (this._mode == 'Teacher') {
-      return Mutation(
-        options: MutationOptions(document: """
-            mutation SignUpTeacher(\$name: String!, \$email: String!, \$password: String!){
-              createTeacher(teacherInput: {name: \$name, email: \$email, password: \$password}) {
-                name
-              }
-            }
-        """),
-        builder: (
-          RunMutation runMutation,
-          QueryResult result,
-        ){
-          return MaterialButton(
-            highlightColor: Colors.transparent,
-            splashColor: Theme.Colors.loginGradientEnd,
-            //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10.0, horizontal: 42.0
-              ),
-              child: Text(
-                "SIGN UP",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25.0,
-                  fontFamily: "WorkSansBold"),
-              ),
-            ),
-            onPressed: () => signUp(runMutation)
-            );
-        },
-        onCompleted: (dynamic resultData) {
-          if(resultData == null) {
-            print(resultData);
-            showInSnackBar('User already Exists');
-          }
-          else {
-            final teacherName = resultData.data["createTeacher"]["name"];
-            print(teacherName);
-//            showInSnackBar(teacherName.toString());
-            Navigator.pushReplacementNamed(context, '/teacher');
-          }
-        },
-      );
-    } else {
-      Navigator.pushReplacementNamed(context, '/student');
-    }
-  }
-
-  _initLogIn(context) {
-    if (this._mode == 'Teacher') {
+  _initSignup(context) {
+    if (_mode == 'Teacher') {
       return ScopedModelDescendant<AppModel>(
-          builder: (context, child, model) => Mutation(
+        builder: (context, child, model) => Mutation(
           options: MutationOptions(document: """
-              mutation loginTeacher(\$method: String!, \$password: String!){
-                loginTeacher(method: \$method, password: \$password) {
-                  userId
+              mutation SignUpTeacher(\$name: String!, \$email: String!, \$password: String!){
+                createTeacher(teacherInput: {name: \$name, email: \$email, password: \$password}) {
                   token
+                  userId
                 }
               }
+          """),
+          builder: (
+            RunMutation runMutation,
+            QueryResult result,
+          ){
+            return MaterialButton(
+              highlightColor: Colors.transparent,
+              splashColor: Theme.Colors.loginGradientEnd,
+              //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0, horizontal: 42.0
+                ),
+                child: Text(
+                  "SIGN UP",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25.0,
+                    fontFamily: "WorkSansBold"),
+                ),
+              ),
+              onPressed: () => signUp(runMutation)
+              );
+          },
+          onCompleted: (dynamic resultData) {
+            print("At Least Mutated");
+            if(resultData == null) {
+              print(resultData);
+              showInSnackBar('User already Exists');
+            }
+            else {
+              model.setToken(resultData["createTeacher"]["token"]);
+              model.setId(resultData["createTeacher"]["userId"]);
+              Navigator.pushReplacementNamed(context, '/teacher');
+            }
+          },
+        )
+      );
+    } else {
+      return ScopedModelDescendant<AppModel> (
+        builder: (context, child, model) =>  Mutation(
+          options: MutationOptions(document: """
+            mutation SignUpStudent(\$name: String!, \$email: String!, \$password: String!){
+              createStudent(studentInput: {name: \$name, email: \$email, password: \$password}) {
+                token
+                userId
+              }
+            }
           """),
           builder: (
               RunMutation runMutation,
               QueryResult result,
               ){
             return MaterialButton(
-                highlightColor: Colors.transparent,
-                splashColor: Theme.Colors.loginGradientEnd,
-                //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 42.0
-                  ),
-                  child: Text(
-                    "LOG IN",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 25.0,
-                        fontFamily: "WorkSansBold"),
-                  ),
+              highlightColor: Colors.transparent,
+              splashColor: Theme.Colors.loginGradientEnd,
+              //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0, horizontal: 42.0
                 ),
-                onPressed: () => logIn(runMutation)
+                child: Text(
+                  "SIGN UP",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25.0,
+                    fontFamily: "WorkSansBold"),
+                ),
+              ),
+              onPressed: () => signUp(runMutation)
+            );
+          },
+          onCompleted: (dynamic resultData) {
+            print("At Least Mutated");
+            if(resultData == null) {
+              print(resultData);
+              showInSnackBar('User already Exists');
+            }
+            else {
+              model.setToken(resultData["createStudent"]["token"]);
+              model.setId(resultData["createStudent"]["userId"]);
+              Navigator.pushReplacementNamed(context, '/student');
+            }
+          },
+        )
+      );
+    }
+  }
+
+  onValue (queryResult) {
+    print("Logged IN Too");
+    print(queryResult);
+  }
+
+  _initLogIn(context) {
+    if (_mode == 'Teacher') {
+      return ScopedModelDescendant<AppModel>(
+        builder: (context, child, model) => Mutation(
+          options: MutationOptions(document: """
+            mutation loginTeacher(\$method: String!, \$password: String!){
+              loginTeacher(method: \$method, password: \$password) {
+                userId
+                token
+              }
+            }
+          """),
+          builder: (
+            RunMutation runMutation,
+            QueryResult result,
+            ){
+            return MaterialButton(
+              highlightColor: Colors.transparent,
+              splashColor: Theme.Colors.loginGradientEnd,
+              //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0, horizontal: 42.0
+                ),
+                child: Text(
+                  "LOG IN",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25.0,
+                    fontFamily: "WorkSansBold"),
+                ),
+              ),
+              onPressed: () => logIn(runMutation, null, null)
             );
           },
           onCompleted: (dynamic resultData) {
             if(resultData != null) {
-              print(resultData.data);
-              model.setToken(resultData.data["loginTeacher"]["token"]);
-              model.setId(resultData.data["loginTeacher"]["userId"]);
+              print("See Next");
+              print(resultData);
+              model.setToken(resultData["loginTeacher"]["token"]);
+              model.setId(resultData["loginTeacher"]["userId"]);
               Navigator.pushReplacementNamed(context, '/teacher');
             }
             else {
@@ -745,7 +798,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 token
               }
             }
-        """),
+          """),
           builder: (
               RunMutation runMutation,
               QueryResult result,
@@ -756,24 +809,24 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 42.0
+                  vertical: 10.0, horizontal: 42.0
                 ),
                 child: Text(
                   "LOG IN",
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25.0,
-                      fontFamily: "WorkSansBold"),
+                    color: Colors.white,
+                    fontSize: 25.0,
+                    fontFamily: "WorkSansBold"),
                 ),
               ),
-              onPressed: () => logIn(runMutation)
+              onPressed: () => logIn(runMutation, null, null)
             );
           },
           onCompleted: (dynamic resultData) {
             if(resultData != null) {
-              print(resultData.data);
-              model.setToken(resultData.data["loginStudent"]["token"]);
-              model.setId(resultData.data["loginStudent"]["userId"]);
+              print(resultData);
+              model.setToken(resultData["loginStudent"]["token"]);
+              model.setId(resultData["loginStudent"]["userId"]);
               Navigator.pushReplacementNamed(context, '/student');
             }
             else {
@@ -785,16 +838,25 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     }
   }
 
-  void logIn (runMutation) {
+  void logIn (runMutation, String method, String password) {
 //    if(_mode == 'Student') {
 //      Navigator.pushReplacementNamed(context, '/student');
 //    }
 //    else {
-      print(loginEmailController.text);
-      runMutation({
-        "method": loginEmailController.text,
-        "password": loginPasswordController.text,
-      });
+      if(runMutation == null) {
+        print(method);
+        runMutation({
+          "method": method,
+          "password": password,
+        });
+      }
+      else {
+        print(loginEmailController.text);
+        runMutation({
+          "method": loginEmailController.text,
+          "password": loginPasswordController.text,
+        });
+      }
 //    }
   }
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import './components/student/student.dart';
 import './components/teacher/teacher.dart';
 
-// graphql Provider
+// GraphQL Provider
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 //Temporary
@@ -31,7 +31,8 @@ void main() => runApp(
         model: AppModel(),
         child: ScopedModelDescendant<AppModel>(
             builder: (context, child, model) => MyApp(token: model.token, id: model.id ))
-));
+    )
+);
 
 class MyApp extends StatelessWidget {
 
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
 
     final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
         GraphQLClient(link: link as Link,
-            cache: OptimisticCache(dataIdFromObject: typenameDataIdFromObject))
+            cache: InMemoryCache())
     );
 
     return GraphQLProvider(
