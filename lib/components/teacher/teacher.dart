@@ -14,12 +14,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sparkline/flutter_sparkline.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-// Shared Preferences
 import 'package:shared_preferences/shared_preferences.dart';
-
-// GraphQL
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:scoped_model/scoped_model.dart';
+import '../../models/AppModel.dart';
 
 class Teacher extends StatefulWidget {
   @override
@@ -97,6 +95,8 @@ class _TeacherState extends State<Teacher> {
             teacherCourses {
               name
               code
+              token
+              strength
             }
           }
           """, variables: <String, dynamic> {}, pollInterval: 100, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
@@ -112,50 +112,73 @@ class _TeacherState extends State<Teacher> {
                 }
                 List courses = result.data["teacherCourses"];
                 print(courses);
-                return ListView.builder(
-                  itemCount: result.data["teacherCourses"].length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.only(top: 16.0, left: 12.0, right: 12.0),
-                      child: Material(
+                return ScopedModelDescendant<AppModel>(
+                  builder: (context, child, model) => ListView.builder(
+                    itemCount: result.data["teacherCourses"].length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 16.0, left: 12.0, right: 12.0),
+                        child: Material(
                           elevation: 14.0,
                           borderRadius: BorderRadius.circular(12.0),
                           shadowColor: Color(0x802196F3),
                           color: Colors.white,
                           child: InkWell(
                             // Do onTap() if it isn't null, otherwise do print()
-                              onTap: () => () { },
-                              child: Padding (
-                                padding: const EdgeInsets.all(24.0),
-                                child: Row (
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                            onTap: () => showBottomSheet(context: context, builder: (builder) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    leading: Icon(Icons.music_note),
+                                    title: Text('Create Session'),
+                                    onTap: () => {createSessionScanerio(model, courses[index]["token"])},
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.music_note),
+                                    title: Text('Previous Sessions'),
+                                    onTap: () => {goToPreviousSessions(model, courses[index]["code"])},
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.photo_album),
+                                    title: Text('Course Information'),
+                                    onTap: () => {goToCourse(model, courses[index]["token"], courses[index]["code"], courses[index]["name"], courses[index]["strength"])},
+                                  ),
+                                ],
+                              );
+                            }),
+                            child: Padding (
+                              padding: const EdgeInsets.all(24.0),
+                              child: Row (
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget> [
+                                  Column (
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget> [
-                                      Column (
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget> [
-                                          Text('${courses[index]["code"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
-                                          Text('${courses[index]["name"]}', style: TextStyle(color: Colors.redAccent)),
-                                        ],
-                                      ),
-                                      Material (
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.circular(24.0),
-                                          child: Center (
-                                              child: Padding (
-                                                padding: EdgeInsets.all(16.0),
-                                                child: Icon(Icons.add, color: Colors.white, size: 30.0),
-                                              )
-                                          )
+                                      Text('${courses[index]["code"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
+                                      Text('${courses[index]["name"]}', style: TextStyle(color: Colors.redAccent)),
+                                    ],
+                                  ),
+                                  Material (
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(24.0),
+                                    child: Center (
+                                      child: Padding (
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Icon(Icons.add, color: Colors.white, size: 30.0),
                                       )
-                                    ]
-                                ),
-                              )
+                                    )
+                                  )
+                                ]
+                              ),
+                            )
                           )
-                      ),
-                    );
-                  },
+                        ),
+                      );
+                    },
+                  )
                 );
               },
               ),
@@ -163,110 +186,24 @@ class _TeacherState extends State<Teacher> {
           ],
         )
       );
-//        body: StaggeredGridView.count(
-//          crossAxisCount: 2,
-//          crossAxisSpacing: 12.0,
-//          mainAxisSpacing: 12.0,
-//          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-//          children: <Widget>[
-//            Container (
-//              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
-//              child: Material (
-//                elevation: 8.0,
-//                color: Colors.black,
-//                borderRadius: BorderRadius.circular(32.0),
-//                child: InkWell (
-//                  onTap: ()=>Navigator.pushReplacementNamed(context, '/create'),
-//                  child: Padding (
-//                    padding: EdgeInsets.all(12.0),
-//                    child: Row (
-//                      mainAxisSize: MainAxisSize.min,
-//                      mainAxisAlignment: MainAxisAlignment.center,
-//                      crossAxisAlignment: CrossAxisAlignment.center,
-//                      children: <Widget> [
-//                        Icon(Icons.add, color: Colors.white),
-//                        Padding(padding: EdgeInsets.only(right: 16.0)),
-//                        Text('ADD A COURSE', style: TextStyle(color: Colors.white))
-//                      ],
-//                    ),
-//                  ),
-//                ),
-//              )
-//            ),
-//            Container (
-//              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
-//              child: Material (
-//                elevation: 8.0,
-//                color: Colors.black,
-//                borderRadius: BorderRadius.circular(32.0),
-//                child: InkWell (
-//                  onTap: ()=>Navigator.pushReplacementNamed(context, '/createSess'),
-//                  child: Padding (
-//                    padding: EdgeInsets.all(12.0),
-//                    child: Row (
-//                      mainAxisSize: MainAxisSize.min,
-//                      mainAxisAlignment: MainAxisAlignment.center,
-//                      crossAxisAlignment: CrossAxisAlignment.center,
-//                      children: <Widget> [
-//                        Icon(Icons.add, color: Colors.white),
-//                        Padding(padding: EdgeInsets.only(right: 16.0)),
-//                        Text('START A SESSION', style: TextStyle(color: Colors.white))
-//                      ],
-//                    ),
-//                  ),
-//                ),
-//              )
-//            ),
-//
-//            _buildTile(
-//              Padding (
-//                padding: const EdgeInsets.all(24.0),
-//                child: Row (
-//                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                    crossAxisAlignment: CrossAxisAlignment.center,
-//                    children: <Widget> [
-//                      Column (
-//                        mainAxisAlignment: MainAxisAlignment.center,
-//                        crossAxisAlignment: CrossAxisAlignment.start,
-//                        children: <Widget> [
-//                          Text('UTA002', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
-//                          Text('Mechanics', style: TextStyle(color: Colors.redAccent)),
-//                        ],
-//                      ),
-//                      Material (
-//                        color: Colors.red,
-//                        borderRadius: BorderRadius.circular(24.0),
-//                        child: Center (
-//                          child: Padding (
-//                            padding: EdgeInsets.all(16.0),
-//                            child: Icon(Icons.add, color: Colors.white, size: 30.0),
-//                          )
-//                        )
-//                      )
-//                    ]
-//                ),
-//              ),
-//            )
-//          ],
-//          staggeredTiles: [
-//            StaggeredTile.extent(2, 110.0),
-//            StaggeredTile.extent(2, 110.0),
-//            StaggeredTile.extent(2, 110.0),
-//          ],
-//        )
-//    );
   }
 
-  Widget _buildTile(Widget child, {Function() onTap}) {
-    return Material(
-        elevation: 14.0,
-        borderRadius: BorderRadius.circular(12.0),
-        shadowColor: Color(0x802196F3),
-        child: InkWell (
-          // Do onTap() if it isn't null, otherwise do print()
-            onTap: onTap != null ? () => onTap() : () { print('Not set yet'); },
-            child: child
-        )
-    );
+  createSessionScanerio (model, token) {
+    model.setCourseToken(token);
+    Navigator.pushNamed(context, '/createSess');
   }
+
+  goToPreviousSessions (model, code) {
+    model.setCourseCode(code);
+    Navigator.pushNamed(context, '/sessions');
+  }
+
+  goToCourse (model, token, name, code, strength) {
+    model.setCourseToken(token);
+    model.setCourseCode(code);
+    model.setCourseName(name);
+    model.setCourseStrength(strength);
+    Navigator.pushNamed(context, '/course');
+  }
+
 }

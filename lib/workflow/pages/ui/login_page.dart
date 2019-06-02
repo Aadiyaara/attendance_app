@@ -639,12 +639,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       return ScopedModelDescendant<AppModel>(
         builder: (context, child, model) => Mutation(
           options: MutationOptions(document: """
-              mutation SignUpTeacher(\$name: String!, \$email: String!, \$password: String!){
-                createTeacher(teacherInput: {name: \$name, email: \$email, password: \$password}) {
-                  token
-                  userId
-                }
+            mutation SignUpTeacher(\$name: String!, \$email: String!, \$password: String!){
+              createTeacher(teacherInput: {name: \$name, email: \$email, password: \$password}) {
+                token
+                userId
               }
+            }
           """),
           builder: (
             RunMutation runMutation,

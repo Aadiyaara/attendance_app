@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import './components/student/student.dart';
 import './components/teacher/teacher.dart';
 
+import './components/teacher/Course.dart';
+
+import './components/teacher/Sessions.dart';
+
 // GraphQL Provider
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -67,6 +71,8 @@ class MyApp extends StatelessWidget {
           '/teacher': (BuildContext context) => Teacher(),
           '/student': (BuildContext context) => Student(),
           '/create': (BuildContext context)=> CreateCourse(),
+          '/course': (BuildContext context)=> Course(),
+          '/sessions': (BuildContext context)=> Session(),
           '/createSess': (BuildContext context)=> CreateSession(),
         },
       ),

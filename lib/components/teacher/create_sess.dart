@@ -1,11 +1,8 @@
-//
 import 'package:flutter/material.dart';
-
-//GraphQL
 import 'package:graphql_flutter/graphql_flutter.dart';
-
-//Shared Preferences
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:scoped_model/scoped_model.dart';
+import '../../models/AppModel.dart';
 
 class CreateSession extends StatefulWidget {
   CreateSession({Key key}) : super(key: key);
@@ -23,8 +20,8 @@ class _CreateSessionState extends State<CreateSession> {
 
   String sessionName;
 
-  String token = "ABC";
-  int attendance = 10;
+  String token = "Get Token";
+  int attendance = 0;
 
   TextEditingController sessionNameController = new TextEditingController();
 
@@ -35,8 +32,8 @@ class _CreateSessionState extends State<CreateSession> {
   Mutation createSession() {
     return Mutation(
       options: MutationOptions(document: """
-        mutation createSession(\$name: String!){
-          createSession(name: \$name) {
+        mutation createSession(\$courseToken: String!, \$name: String!){
+          createSession(courseToken: \$courseToken ,name: \$name) {
             sessionToken
             attendance
           }
@@ -46,14 +43,16 @@ class _CreateSessionState extends State<CreateSession> {
           RunMutation runMutation,
           QueryResult result,
           ) {
-        return RaisedButton(
-          onPressed: () => createNewSession(runMutation),
+        return ScopedModelDescendant<AppModel>(
+            builder: (context, child, model) => RaisedButton(
+          onPressed: () => createNewSession(runMutation, model.courseToken),
           child: Text('Create'),
           color: Colors.pink, //specify background color for the button here
           colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
           disabledColor: Colors.blueGrey, // specify color when the button is disabled
           highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
           padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+          )
         );
       },
       onCompleted: (dynamic resultData) async {
@@ -91,8 +90,10 @@ class _CreateSessionState extends State<CreateSession> {
     });
   }
 
-  void createNewSession (runMutation) {
+  void createNewSession (runMutation, courseToken) {
+    print(courseToken);
     runMutation({
+      "courseToken": courseToken,
       "name": sessionNameController.text
     });
   }
@@ -117,35 +118,36 @@ class _CreateSessionState extends State<CreateSession> {
           child: Container(
             child: Center(
               child: Column(children: [
-                Text("Code: ${token}"),
-                Text("Attendance: ${attendance}"),
                 Padding(padding: EdgeInsets.only(top: 140.0)),
                 Text(
                   'Session Details',
                   style: new TextStyle(color: Colors.blue, fontSize: 25.0),
                 ),
                 Padding(padding: EdgeInsets.only(top: 50.0)),
-                TextFormField(
-                  controller: sessionNameController,
-                  decoration: new InputDecoration(
-                    labelText: "Session name",
-                    fillColor: Colors.white,
-                    border: new OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(25.0),
-                      borderSide: new BorderSide(),
+                Padding(
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                  child: TextFormField(
+                    controller: sessionNameController,
+                    decoration: new InputDecoration(
+                      labelText: "Session name",
+                      fillColor: Colors.white,
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: new BorderSide(),
+                      ),
+                      //fillColor: Colors.green
                     ),
-                    //fillColor: Colors.green
-                  ),
-                  validator: (val) {
-                    if (val.length == 0) {
-                      return "Session cannot be empty";
-                    } else {
-                      return null;
-                    }
-                  },
-                  keyboardType: TextInputType.emailAddress,
-                  style: new TextStyle(
-                    fontFamily: "Poppins",
+                    validator: (val) {
+                      if (val.length == 0) {
+                        return "Session cannot be empty";
+                      } else {
+                        return null;
+                      }
+                    },
+                    keyboardType: TextInputType.emailAddress,
+                    style: new TextStyle(
+                      fontFamily: "Poppins",
+                    ),
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(top: 20.0)),
@@ -164,6 +166,10 @@ class _CreateSessionState extends State<CreateSession> {
                       padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
                     )
                   ],
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(),
                 ),
                 Container(
                   height: 150,
