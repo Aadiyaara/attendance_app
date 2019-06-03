@@ -98,6 +98,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Padding(
+                  padding: EdgeInsets.only(top: 75.0),
+                  child: new Image(
+                      width: 250.0,
+                      height: 41.0,
+                      fit: BoxFit.fill,
+                      image: new AssetImage(
+                        'assets/img/doubtout.png',
+                      )),
+                ),
+                    Padding(
                       padding: EdgeInsets.only(top: 20.0),
                       child: _buildMenuBar(context),
                     ),
@@ -119,6 +129,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           }
                         },
                         children: <Widget>[
+                           
+
                           new ConstrainedBox(
                             constraints: const BoxConstraints.expand(),
                             child: _buildSignIn(context),
@@ -256,7 +268,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   child: Text(
                     "Teacher",
                     style: TextStyle(
-                        color: left,
+                        color: Colors.white,
                         fontSize: 16.0,
                         fontFamily: "WorkSansSemiBold"),
                   ),
@@ -271,7 +283,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   child: Text(
                     "Student",
                     style: TextStyle(
-                        color: right,
+                        color: Colors.white,
                         fontSize: 16.0,
                         fontFamily: "WorkSansSemiBold"),
                   ),
