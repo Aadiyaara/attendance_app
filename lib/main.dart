@@ -11,6 +11,8 @@ import './components/teacher/Sessions.dart';
 // GraphQL Provider
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import './components/student/join_course.dart';
+
 //Temporary
 import 'workflow/pages/main_page.dart';
 import 'workflow/pages/ui/login_page.dart';
@@ -74,6 +76,7 @@ class MyApp extends StatelessWidget {
           '/course': (BuildContext context)=> Course(),
           '/sessions': (BuildContext context)=> Session(),
           '/createSess': (BuildContext context)=> CreateSession(),
+          '/joinCourse': (BuildContext context)=> JoinCourse(),
         },
       ),
       client: client,

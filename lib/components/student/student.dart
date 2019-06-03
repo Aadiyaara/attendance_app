@@ -13,43 +13,7 @@ class _StudentState extends State<Student> {
   List <String> courseNames = ["this"];
   List <String> courseCodes;
 
-  TextEditingController courseTokenController = new TextEditingController();
   TextEditingController sessionTokenController = new TextEditingController();
-
-  Mutation joinCourse() {
-    return Mutation(
-      options: MutationOptions(document: """
-            mutation joinCourse(\$token: String!){
-              joinCourse(token: \$token) {
-                name
-              }
-            }
-        """),
-      builder: (
-          RunMutation runMutation,
-          QueryResult result,
-          ) {
-        return RaisedButton(
-          onPressed: () => joinNewCourse(runMutation),
-          child: Text('Join'),
-          color: Colors.pink, //specify background color for the button here
-          colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
-          disabledColor: Colors.blueGrey, // specify color when the button is disabled
-          highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-        );
-      },
-      onCompleted: (dynamic res) {
-        if (res == null) {
-          createAlertDialog(context, "Error", "No Such Session");
-        } else {
-          print(res);
-          createAlertDialog(context, "Success", "Course: ${res["joinCourse"]["name"]}");
-        }
-
-      },
-    );
-  }
 
   Mutation markAttendance() {
     return Mutation(
@@ -78,25 +42,9 @@ class _StudentState extends State<Student> {
         } else {
           print (res);
           createAlertDialog(context, "Success", res["markAttendance"]);
-//          createAlertDialog(context, result, content)
-//          showModalBottomSheet(context: context, builder: (builder) {
-//            return Container(
-//              height: 250,
-//              color: Colors.pink,
-//              child: Center(
-//                child: Text("Code: ${resultData["createCourse"]["token"]}"),
-//              ),
-//            );
-//          });
         }
       },
     );
-  }
-
-  void joinNewCourse(runMutation) {
-    runMutation({
-      "token": courseTokenController.text,
-    });
   }
 
   void markNewAttendance(runMutation) {
@@ -124,32 +72,32 @@ class _StudentState extends State<Student> {
         body: Container(
             child: Column(
                 children: <Widget>[
-                  Padding(padding: EdgeInsets.only(top: 50.0)),
-                  TextFormField(
-                    controller: courseTokenController,
-                    decoration: new InputDecoration(
-                      labelText: "Course Token",
-                      fillColor: Colors.white,
-                      border: new OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(25.0),
-                        borderSide: new BorderSide(),
-                      ),
-                      //fillColor: Colors.green
-                    ),
-                    validator: (val) {
-                      if (val.length == 0) {
-                        return "Course cannot be empty";
-                      } else {
-                        return null;
-                      }
-                    },
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                    ),
-                  ),
-                  joinCourse(),
                   Padding(padding: EdgeInsets.only(top: 20.0)),
+                  Container (
+                    margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
+                    child: Material (
+                      elevation: 8.0,
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(32.0),
+                      child: InkWell (
+                        onTap: ()=> Navigator.pushReplacementNamed(context, '/joinCourse'),
+                        child: Padding (
+                          padding: EdgeInsets.all(12.0),
+                          child: Row (
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget> [
+                              Icon(Icons.add, color: Colors.white),
+                              Padding(padding: EdgeInsets.only(right: 16.0)),
+                              Text('ADD A COURSE', style: TextStyle(color: Colors.white))
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ),
+                  Padding(padding: EdgeInsets.only(top: 15.0)),
                   TextFormField(
                     controller: sessionTokenController,
                     decoration: InputDecoration(
@@ -163,7 +111,7 @@ class _StudentState extends State<Student> {
                     ),
                     validator: (val) {
                       if (val.length == 0) {
-                        return "Course No cannot be empty";
+                        return "Session Token cannot be empty";
                       } else {
                         return null;
                       }

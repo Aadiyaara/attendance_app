@@ -64,8 +64,8 @@ class _TeacherState extends State<Teacher> {
               height: MediaQuery.of(context).size.height * 0.16,
 //              color: Colors.pink,
               child: Container (
-              margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
-              child: Material (
+                margin: EdgeInsets.symmetric(vertical: 25.0, horizontal: 54.0),
+                child: Material (
                 elevation: 8.0,
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(32.0),
