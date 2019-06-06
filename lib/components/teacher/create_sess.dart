@@ -3,6 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../models/AppModel.dart';
+import 'package:intl/intl.dart';
 
 class CreateSession extends StatefulWidget {
   CreateSession({Key key}) : super(key: key);
@@ -20,10 +21,12 @@ class _CreateSessionState extends State<CreateSession> {
 
   String sessionName;
 
+  int dropDownSelect = null;
+  int validityDropDownSelect = null;
+
+  String sessionId;
   String token = "Get Token";
   int attendance = 0;
-
-  TextEditingController sessionNameController = new TextEditingController();
 
 //  Client client = GraphqlProvider.of(context).value;
 //  to set the authorization header with an api token
@@ -32,8 +35,9 @@ class _CreateSessionState extends State<CreateSession> {
   Mutation createSession() {
     return Mutation(
       options: MutationOptions(document: """
-        mutation createSession(\$courseToken: String!, \$name: String!){
-          createSession(courseToken: \$courseToken ,name: \$name) {
+        mutation createSession(\$courseToken: String!, \$name: String!, \$incDelta){
+          createSession(courseToken: \$courseToken ,name: \$name, type: "General", incDelta: \$incDelta) {
+            _id
             sessionToken
             attendance
           }
@@ -61,10 +65,14 @@ class _CreateSessionState extends State<CreateSession> {
         } else {
           print (resultData["createSession"]["sessionToken"]);
           setState((){
+            sessionId = resultData["createSession"]["_id"];
             token = resultData["createSession"]["sessionToken"];
             attendance = resultData["createSession"]["attendance"];
           });
-          keepAsking(sessionNameController.text);
+          keepAsking(DateFormat("dd-MM-yyyy hh:mm:ss").format(now));
+          Future.delayed(Duration(milliseconds: (60 * 1000 * validityDropDownSelect)), () {
+            completeSession();
+          });
         }
       },
     );
@@ -91,11 +99,46 @@ class _CreateSessionState extends State<CreateSession> {
   }
 
   void createNewSession (runMutation, courseToken) {
-    print(courseToken);
+    if(dropDownSelect == null) {
+      showInSnackBar("Enter Duration");
+      return;
+    }
     runMutation({
       "courseToken": courseToken,
-      "name": sessionNameController.text
+      "name": DateFormat("dd-MM-yyyy hh:mm:ss").format(now),
+      "incDelta": dropDownSelect
     });
+  }
+  
+  void completeSession () {
+    GraphQLProvider.of(context).value.mutate(MutationOptions(document: """
+      mutation completeSession(\$sessionId: String!){
+        completeSession(sessionId: \$sessionId) {
+          isComplete
+        }
+      }
+    """, variables: <String, dynamic> {
+      "sessionId": sessionId
+    })).then((res) => {
+      print(res)
+    });
+  }
+
+  void showInSnackBar(String value) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _sessionScaffoldKey.currentState?.removeCurrentSnackBar();
+    _sessionScaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Colors.red,
+            fontSize: 16.0,
+            fontFamily: "WorkSansSemiBold"),
+      ),
+      backgroundColor: Colors.white,
+      duration: Duration(seconds: 3),
+    ));
   }
 
   @override
@@ -104,15 +147,31 @@ class _CreateSessionState extends State<CreateSession> {
     super.initState();
   }
 
+  var now = new DateTime.now();
+
+  List <DropdownMenuItem<int>> listDrop = [];
+  List <DropdownMenuItem<int>> validityDrop = [DropdownMenuItem(child: Text('1min'), value: 1,), DropdownMenuItem(child: Text('2min'), value: 2,), DropdownMenuItem(child: Text('5min'), value: 5,), DropdownMenuItem(child: Text('10min'), value: 10,)];
+
+  void loadDropDown () {
+    listDrop = [];
+    listDrop.add(DropdownMenuItem(child: Text('1hr'), value: 1,));
+    listDrop.add(DropdownMenuItem(child: Text('2hr'), value: 2,));
+    listDrop.add(DropdownMenuItem(child: Text('3hr'), value: 3,));
+    listDrop.add(DropdownMenuItem(child: Text('4hr'), value: 4,));
+    listDrop.add(DropdownMenuItem(child: Text('5hr'), value: 5,));
+  }
 
   final GlobalKey<ScaffoldState> _sessionScaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    loadDropDown();
+
     return Scaffold(
       key: _sessionScaffoldKey,
-        body: Container(
+        body: ScopedModelDescendant<AppModel>(
+            builder: (context, child, model) =>  Container(
 //          padding: const EdgeInsets.all(30.0),
           color: Colors.white,
           child: Container(
@@ -125,30 +184,36 @@ class _CreateSessionState extends State<CreateSession> {
                 ),
                 Padding(padding: EdgeInsets.only(top: 50.0)),
                 Padding(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                  child: TextFormField(
-                    controller: sessionNameController,
-                    decoration: new InputDecoration(
-                      labelText: "Session name",
-                      fillColor: Colors.white,
-                      border: new OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(25.0),
-                        borderSide: new BorderSide(),
-                      ),
-                      //fillColor: Colors.green
-                    ),
-                    validator: (val) {
-                      if (val.length == 0) {
-                        return "Session cannot be empty";
-                      } else {
-                        return null;
-                      }
-                    },
-                    keyboardType: TextInputType.emailAddress,
-                    style: new TextStyle(
-                      fontFamily: "Poppins",
-                    ),
-                  ),
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0),),
+                Text(model.courseName),
+                Text(DateFormat("dd-MM-yyyy hh:mm:ss").format(now)),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text('For hours: '),
+                    DropdownButton(
+                        value: dropDownSelect,
+                        items: listDrop,
+                        hint: Text('Select'),
+                        onChanged: (value) => {selectDropDown(value)}
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Allow till: '),
+                    DropdownButton(
+                        value: validityDropDownSelect,
+                        items: validityDrop,
+                        hint: Text('Select'),
+                        onChanged: (value) => {selectValidityDropDown(value)}
+                    )
+                  ],
                 ),
                 Padding(padding: EdgeInsets.only(top: 20.0)),
                 Row(
@@ -189,12 +254,24 @@ class _CreateSessionState extends State<CreateSession> {
           ),
         )
       )
-    );
+    ));
   }
+
+  void selectDropDown (value) {
+    setState(() {
+      dropDownSelect = value;
+    });
+  }
+
+  void selectValidityDropDown (value) {
+    setState(() {
+      validityDropDownSelect = value;
+    });
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    sessionNameController.dispose();
   }
 }

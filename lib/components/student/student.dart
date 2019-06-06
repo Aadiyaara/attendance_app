@@ -41,7 +41,12 @@ class _StudentState extends State<Student> {
           createAlertDialog(context, "Error", "No Such Class");
         } else {
           print (res);
-          createAlertDialog(context, "Success", res["markAttendance"]);
+          if(res["markAttendance"] == 'Marked Present') {
+            createAlertDialog(context, "Success", res["markAttendance"]);
+          }
+          else {
+            createAlertDialog(context, "Error", res["markAttendance"]);
+          }
         }
       },
     );

@@ -3,17 +3,23 @@ import 'package:scoped_model/scoped_model.dart';
 class AppModel extends Model {
   String _token;
   String _id;
+
   String _courseToken;
   String _courseCode;
   String _courseName;
   int _courseStrength;
 
+  String _sessionId;
+
   String get token => _token;
   String get id => _id;
+
   String get courseToken => _courseToken;
   String get courseCode => _courseCode;
   String get courseName => _courseName;
   int get courseStrength => _courseStrength;
+
+  String get sessionId => _sessionId;
 
   void setToken(String t) {
     _token = t;
@@ -44,6 +50,11 @@ class AppModel extends Model {
 
   void setCourseStrength(int t) {
     _courseStrength = t;
+    notifyListeners();
+  }
+
+  void setSessionId(String t) {
+    _sessionId = t;
     notifyListeners();
   }
 }

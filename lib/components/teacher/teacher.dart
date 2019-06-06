@@ -132,7 +132,7 @@ class _TeacherState extends State<Teacher> {
                                   ListTile(
                                     leading: Icon(Icons.music_note),
                                     title: Text('Create Session'),
-                                    onTap: () => {createSessionScanerio(model, courses[index]["token"])},
+                                    onTap: () => {createSessionScanerio(model, courses[index]["token"], courses[index]["name"])},
                                   ),
                                   ListTile(
                                     leading: Icon(Icons.music_note),
@@ -188,8 +188,9 @@ class _TeacherState extends State<Teacher> {
       );
   }
 
-  createSessionScanerio (model, token) {
+  createSessionScanerio (model, token, courseName) {
     model.setCourseToken(token);
+    model.setCourseName(courseName);
     Navigator.pushNamed(context, '/createSess');
   }
 
@@ -198,7 +199,7 @@ class _TeacherState extends State<Teacher> {
     Navigator.pushNamed(context, '/sessions');
   }
 
-  goToCourse (model, token, name, code, strength) {
+  goToCourse (model, token, code, name, strength) {
     model.setCourseToken(token);
     model.setCourseCode(code);
     model.setCourseName(name);
