@@ -86,8 +86,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 decoration: new BoxDecoration(
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.Colors.loginGradientStart,
-                        Theme.Colors.loginGradientEnd
+                        Colors.blueAccent,
+                        Colors.blueAccent
                       ],
                       begin: const FractionalOffset(0.0, 0.0),
                       end: const FractionalOffset(1.0, 1.0),
@@ -249,49 +249,49 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             ),
           ),
         ),
-        Container(
-          width: 300.0,
-          height: 50.0,
-          margin: EdgeInsets.only(top: 25.0),
-          decoration: BoxDecoration(
-            color: Color(0x552B2B2B),
-            borderRadius: BorderRadius.all(Radius.circular(25.0)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Expanded(
-                child: FlatButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onPressed: _onTeacherButtonPress,
-                  child: Text(
-                    "Teacher",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontFamily: "WorkSansSemiBold"),
-                  ),
-                ),
-              ),
-              //Container(height: 33.0, width: 1.0, color: Colors.white),
-              Expanded(
-                child: FlatButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onPressed: _onStudentButtonPress,
-                  child: Text(
-                    "Student",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontFamily: "WorkSansSemiBold"),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Container(
+        //   width: 300.0,
+        //   height: 50.0,
+        //   margin: EdgeInsets.only(top: 25.0),
+        //   decoration: BoxDecoration(
+        //     color: Color(0x552B2B2B),
+        //     borderRadius: BorderRadius.all(Radius.circular(25.0)),
+        //   ),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //     children: <Widget>[
+        //       Expanded(
+        //         child: FlatButton(
+        //           splashColor: Colors.transparent,
+        //           highlightColor: Colors.transparent,
+        //           onPressed: _onTeacherButtonPress,
+        //           child: Text(
+        //             "Teacher",
+        //             style: TextStyle(
+        //                 color: Colors.white,
+        //                 fontSize: 16.0,
+        //                 fontFamily: "WorkSansSemiBold"),
+        //           ),
+        //         ),
+        //       ),
+        //       //Container(height: 33.0, width: 1.0, color: Colors.white),
+        //       Expanded(
+        //         child: FlatButton(
+        //           splashColor: Colors.transparent,
+        //           highlightColor: Colors.transparent,
+        //           onPressed: _onStudentButtonPress,
+        //           child: Text(
+        //             "Student",
+        //             style: TextStyle(
+        //                 color: Colors.white,
+        //                 fontSize: 16.0,
+        //                 fontFamily: "WorkSansSemiBold"),
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
@@ -307,6 +307,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
     return Center(
         child: Container(
+          height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        color: Colors.blueAccent,
+        image: DecorationImage(
+          colorFilter: new ColorFilter.mode(
+              Colors.black.withOpacity(0.1), BlendMode.dstATop),
+          image: AssetImage('assets/img/logo.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
         padding: EdgeInsets.only(top: 20.0),
         child: Column(
           children: <Widget>[
@@ -400,20 +410,20 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                        color: Theme.Colors.loginGradientStart,
+                        color: Colors.blueAccent,
                         offset: Offset(1.0, 6.0),
                         blurRadius: 20.0,
                       ),
                       BoxShadow(
-                        color: Theme.Colors.loginGradientEnd,
+                        color: Colors.black38,
                         offset: Offset(1.0, 6.0),
                         blurRadius: 20.0,
                       ),
                     ],
                     gradient: new LinearGradient(
                         colors: [
-                          Theme.Colors.loginGradientEnd,
-                          Theme.Colors.loginGradientStart
+                          Colors.blue,
+                          Colors.blue
                         ],
                         begin: const FractionalOffset(0.2, 0.2),
                         end: const FractionalOffset(1.0, 1.0),
@@ -445,6 +455,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   Widget _buildSignUp(BuildContext context) {
     return Container(
+      
       padding: EdgeInsets.only(top: 23.0),
       child: Column(
         children: <Widget>[
@@ -452,6 +463,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             alignment: Alignment.topCenter,
             overflow: Overflow.visible,
             children: <Widget>[
+
               Card(
                 elevation: 2.0,
                 color: Colors.white,
@@ -603,20 +615,20 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
+                      color: Colors.blueAccent,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
+                      color: Colors.black45,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
+                        Colors.blue,
+                        Colors.blue
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -664,7 +676,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           ){
             return MaterialButton(
               highlightColor: Colors.transparent,
-              splashColor: Theme.Colors.loginGradientEnd,
+              splashColor: Colors.blueAccent,
               //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -712,7 +724,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               ){
             return MaterialButton(
               highlightColor: Colors.transparent,
-              splashColor: Theme.Colors.loginGradientEnd,
+              splashColor: Colors.blueAccent,
               //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -769,7 +781,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             ){
             return MaterialButton(
               highlightColor: Colors.transparent,
-              splashColor: Theme.Colors.loginGradientEnd,
+              splashColor: Colors.blueAccent,
               //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -817,7 +829,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               ){
             return MaterialButton(
               highlightColor: Colors.transparent,
-              splashColor: Theme.Colors.loginGradientEnd,
+              splashColor: Colors.blueAccent,
               //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
