@@ -2,34 +2,30 @@ import 'package:flutter/material.dart';
 
 class LoginScreen3 extends StatefulWidget {
   @override
-  _LoginScreen3State createState() => new _LoginScreen3State();
+  _LoginScreen3State createState() => _LoginScreen3State();
 }
 
 class _LoginScreen3State extends State<LoginScreen3>
     with TickerProviderStateMixin {
 
- 
-
   @override
   void initState() {
     super.initState();
-
-  
   }
 
   Widget HomePage() {
-    return new Container(
+    return Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
         color: Colors.blueAccent,
         image: DecorationImage(
-          colorFilter: new ColorFilter.mode(
+          colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.1), BlendMode.dstATop),
           image: AssetImage('assets/images/logo.png'),
           fit: BoxFit.cover,
         ),
       ),
-      child: new Column(
+      child: Column(
         children: <Widget>[
           Container(
             padding: EdgeInsets.only(top: 250.0),
@@ -37,7 +33,7 @@ class _LoginScreen3State extends State<LoginScreen3>
              child: Container(
                decoration: BoxDecoration(
                  image: DecorationImage(
-          colorFilter: new ColorFilter.mode(
+          colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(1.0), BlendMode.dstATop),
           image: AssetImage('assets/images/logo.png'),
           fit: BoxFit.cover,
@@ -46,50 +42,28 @@ class _LoginScreen3State extends State<LoginScreen3>
              ),
             ),
           ),
-          // Container(
-          //   padding: EdgeInsets.only(top: 20.0),
-          //   child: new Row(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     children: <Widget>[
-          //       Text(
-          //         "Attendance",
-          //         style: TextStyle(
-          //           color: Colors.white,
-          //           fontSize: 20.0,
-          //         ),
-          //       ),
-          //       Text(
-          //         "App",
-          //         style: TextStyle(
-          //             color: Colors.white,
-          //             fontSize: 20.0,
-          //             fontWeight: FontWeight.bold),
-          //       ),
-          //     ],
-          //   ),
-          // ),
           
-          new Container(
+          Container(
             width: MediaQuery.of(context).size.width,
             margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 30.0),
             alignment: Alignment.center,
-            child: new Row(
+            child: Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
-                    shape: new RoundedRectangleBorder(
+                Expanded(
+                  child: FlatButton(
+                    shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0)),
                     color: Colors.white,
                     onPressed:(){},
-                    child: new Container(
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 20.0,
                         horizontal: 20.0,
                       ),
-                      child: new Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Expanded(
+                          Expanded(
                             child: Text(
                               "A Teacher",
                               textAlign: TextAlign.center,
@@ -106,27 +80,27 @@ class _LoginScreen3State extends State<LoginScreen3>
               ],
             ),
           ),
-          new Container(
+          Container(
             width: MediaQuery.of(context).size.width,
             margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 30.0),
             alignment: Alignment.center,
-            child: new Row(
+            child: Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
+                Expanded(
+                  child: FlatButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0)),
                     color: Colors.white,
                     onPressed:(){},
-                    child: new Container(
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 20.0,
                         horizontal: 20.0,
                       ),
-                      child: new Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new Expanded(
+                          Expanded(
                             child: Text(
                               "A Student",
                               textAlign: TextAlign.center,
@@ -147,13 +121,8 @@ class _LoginScreen3State extends State<LoginScreen3>
       ),
     );
   }
-
-  
  
-
-
- 
-  PageController _controller = new PageController(initialPage: 1, viewportFraction: 1.0);
+  PageController _controller = PageController(initialPage: 1, viewportFraction: 1.0);
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +131,7 @@ class _LoginScreen3State extends State<LoginScreen3>
 
         child: PageView(
           controller: _controller,
-          physics: new AlwaysScrollableScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
           children: <Widget>[ HomePage()],
           scrollDirection: Axis.horizontal,
         ));

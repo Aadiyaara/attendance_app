@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../style/theme.dart' as Theme;
 import '../utils/bubble_indication_painter.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:convert';
 
 // Scoped Model
 import 'package:scoped_model/scoped_model.dart';
@@ -129,8 +126,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           }
                         },
                         children: <Widget>[
-                           
-
                           new ConstrainedBox(
                             constraints: const BoxConstraints.expand(),
                             child: _buildSignIn(context),

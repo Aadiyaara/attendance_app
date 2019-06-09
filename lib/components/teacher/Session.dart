@@ -67,8 +67,6 @@ class _SessionState extends State<Session> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget> [
                                           Text('${students[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
-//                                          Text('Attendance: ${sessions[index]["attendance"]}', style: TextStyle(color: Colors.redAccent)),
-//                                          SafeArea(child: Text('Date Created: ${sessions[index]["dateCreated"]}'.split('GMT')[0], style: TextStyle(color: Colors.redAccent))),
                                         ],
                                       ),
                                       Material (

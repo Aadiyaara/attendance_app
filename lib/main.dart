@@ -1,37 +1,19 @@
 import 'package:flutter/material.dart';
-
-// Phases
 import './components/student/student.dart';
 import './components/teacher/teacher.dart';
-
 import './components/teacher/Course.dart';
-
 import './components/teacher/Sessions.dart';
-
 import './components/teacher/Session.dart';
-
-// GraphQL Provider
 import 'package:graphql_flutter/graphql_flutter.dart';
-
 import './components/student/join_course.dart';
-
-//Temporary
 import 'workflow/pages/main_page.dart';
 import 'workflow/pages/ui/login_page.dart';
 import 'workflow/pages/ui/mark_att.dart';
-
 import './components/teacher/create_course.dart';
 import './components/teacher/create_sess.dart';
-
-//Components
 import './components/pedestal/interface.dart';
-
-//Tests
 import './components/student/student.dart';
 import 'package:scoped_model/scoped_model.dart';
-
-// AppModel
-
 import './models/AppModel.dart';
 
 void main() => runApp(
@@ -81,6 +63,7 @@ class MyApp extends StatelessWidget {
           '/createSess': (BuildContext context)=> CreateSession(),
           '/joinCourse': (BuildContext context)=> JoinCourse(),
         },
+        debugShowCheckedModeBanner: false,
       ),
       client: client,
     );
