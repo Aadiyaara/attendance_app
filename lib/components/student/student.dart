@@ -15,6 +15,128 @@ class _StudentState extends State<Student> {
 
   TextEditingController sessionTokenController = new TextEditingController();
 
+
+  int _year;
+  String _branch;
+  String _group;
+
+  List <DropdownMenuItem<int>> yearDropList = [];
+  List <DropdownMenuItem<String>> branchDropList = [];
+  List <DropdownMenuItem<String>> groupDropList = [];
+
+
+  void buildDrops () {
+    yearDropList = [];
+    branchDropList = [];
+    groupDropList = [];
+    yearDropList.add(DropdownMenuItem(child: Text('1st year'), value: 1,));
+    yearDropList.add(DropdownMenuItem(child: Text('2nd year'), value: 2,));
+    yearDropList.add(DropdownMenuItem(child: Text('3rd year'), value: 3,));
+    yearDropList.add(DropdownMenuItem(child: Text('4th year'), value: 4,));
+    if (_year != null) {
+      if(_year == 1) {
+        branchDropList.add(DropdownMenuItem(child: Text('Group A'), value: 'A',));
+        branchDropList.add(DropdownMenuItem(child: Text('Group B'), value: 'B',));
+      }
+      else if(_year == 2) {
+        branchDropList.add(DropdownMenuItem(child: Text('COE'), value: 'COE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ENC'), value: 'ENC',));
+        branchDropList.add(DropdownMenuItem(child: Text('ECE'), value: 'ECE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CHE'), value: 'CHE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CIE'), value: 'CIE',));
+        branchDropList.add(DropdownMenuItem(child: Text('EIC'), value: 'EIC',));
+        branchDropList.add(DropdownMenuItem(child: Text('MEE'), value: 'MEE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ELE'), value: 'ELE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MPE'), value: 'MPE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MTX'), value: 'MTX',));
+        branchDropList.add(DropdownMenuItem(child: Text('BTD'), value: 'BTD',));
+      }
+      else if(_year == 3) {
+        branchDropList.add(DropdownMenuItem(child: Text('COE'), value: 'COE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ENC'), value: 'ENC',));
+        branchDropList.add(DropdownMenuItem(child: Text('ECE'), value: 'ECE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CHE'), value: 'CHE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CIE'), value: 'CIE',));
+        branchDropList.add(DropdownMenuItem(child: Text('EIC'), value: 'EIC',));
+        branchDropList.add(DropdownMenuItem(child: Text('MEE'), value: 'MEE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ELE'), value: 'ELE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MPE'), value: 'MPE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MTX'), value: 'MTX',));
+        branchDropList.add(DropdownMenuItem(child: Text('BTD'), value: 'BTD',));
+      }
+      else if(_year == 4) {
+        branchDropList.add(DropdownMenuItem(child: Text('COE'), value: 'COE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ENC'), value: 'ENC',));
+        branchDropList.add(DropdownMenuItem(child: Text('ECE'), value: 'ECE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CHE'), value: 'CHE',));
+        branchDropList.add(DropdownMenuItem(child: Text('CIE'), value: 'CIE',));
+        branchDropList.add(DropdownMenuItem(child: Text('EIC'), value: 'EIC',));
+        branchDropList.add(DropdownMenuItem(child: Text('MEE'), value: 'MEE',));
+        branchDropList.add(DropdownMenuItem(child: Text('ELE'), value: 'ELE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MPE'), value: 'MPE',));
+        branchDropList.add(DropdownMenuItem(child: Text('MTX'), value: 'MTX',));
+        branchDropList.add(DropdownMenuItem(child: Text('BTD'), value: 'BTD',));
+      }
+      if(_branch != null) {
+        if(_branch == 'COE') {
+          for(int i = 0; i < 28; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('COE-${i+1}'), value: 'COE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'ENC') {
+          for(int i = 0; i < 6; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('ENC-${i+1}'), value: 'COE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'ECE') {
+          for(int i = 0; i < 6; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('ECE-${i+1}'), value: 'COE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'CIE') {
+          for(int i = 0; i < 4; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('CIE-${i+1}'), value: 'CIE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'EIC') {
+          for(int i = 0; i < 2; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('CHE-${i+1}'), value: 'CHE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'CHE') {
+          for(int i = 0; i < 2; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('CHE-${i+1}'), value: 'CHE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'MEE') {
+          for(int i = 0; i < 12; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('MEE-${i+1}'), value: 'MEE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'MPE') {
+          for(int i = 0; i < 2; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('MPE-${i+1}'), value: 'MPE-${i+1}',),);
+          }
+        }
+        else if(_branch == 'MTX') {
+          for(int i = 0; i < 2; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('MTX-${i+1}'), value: 'MTX-${i+1}',),);
+          }
+        }
+        else if(_branch == 'BTD') {
+          for(int i = 0; i < 3; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('BTD-${i+1}'), value: 'BTD-${i+1}',),);
+          }
+        }
+        else if(_branch == 'ELE') {
+          for(int i = 0; i < 6; i++) {
+            groupDropList.add(DropdownMenuItem(child: Text('ELE-${i+1}'), value: 'ELE-${i+1}',),);
+          }
+        }
+      }
+    }
+  }
+
   Mutation markAttendance() {
     return Mutation(
       options: MutationOptions(document: """

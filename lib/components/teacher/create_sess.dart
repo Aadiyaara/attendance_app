@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../models/AppModel.dart';
 import 'package:intl/intl.dart';
+import './timer.dart';
 
 class CreateSession extends StatefulWidget {
   CreateSession({Key key}) : super(key: key);
@@ -21,22 +22,18 @@ class _CreateSessionState extends State<CreateSession> {
 
   String sessionName;
 
-  int dropDownSelect = null;
+  int incDropDownSelect = null;
   int validityDropDownSelect = null;
 
   String sessionId;
   String token = "Get Token";
   int attendance = 0;
 
-//  Client client = GraphqlProvider.of(context).value;
-//  to set the authorization header with an api token
-//  client.apiToken = '<YOUR_JWT>';
-
   Mutation createSession() {
     return Mutation(
       options: MutationOptions(document: """
-        mutation createSession(\$courseToken: String!, \$name: String!, \$incDelta){
-          createSession(courseToken: \$courseToken ,name: \$name, type: "General", incDelta: \$incDelta) {
+        mutation createSession(\$courseToken: String!, \$name: String!, \$incDelta: Int!){
+          createSession(sessionInput: {courseToken: \$courseToken ,name: \$name, incDelta: \$incDelta}) {
             _id
             sessionToken
             attendance
@@ -49,7 +46,7 @@ class _CreateSessionState extends State<CreateSession> {
           ) {
         return ScopedModelDescendant<AppModel>(
             builder: (context, child, model) => RaisedButton(
-          onPressed: () => createNewSession(runMutation, model.courseToken),
+          onPressed: () => createNewSession(runMutation, model.courseToken, model),
           child: Text('Create'),
           color: Colors.pink, //specify background color for the button here
           colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
@@ -70,9 +67,6 @@ class _CreateSessionState extends State<CreateSession> {
             attendance = resultData["createSession"]["attendance"];
           });
           keepAsking(DateFormat("dd-MM-yyyy hh:mm:ss").format(now));
-          Future.delayed(Duration(milliseconds: (60 * 1000 * validityDropDownSelect)), () {
-            completeSession();
-          });
         }
       },
     );
@@ -98,19 +92,23 @@ class _CreateSessionState extends State<CreateSession> {
     });
   }
 
-  void createNewSession (runMutation, courseToken) {
-    if(dropDownSelect == null) {
+  void createNewSession (runMutation, courseToken, model) {
+    if(incDropDownSelect == null) {
       showInSnackBar("Enter Duration");
       return;
     }
     runMutation({
       "courseToken": courseToken,
       "name": DateFormat("dd-MM-yyyy hh:mm:ss").format(now),
-      "incDelta": dropDownSelect
+      "incDelta": incDropDownSelect
+    });
+    Future.delayed(Duration(milliseconds: (60 * 1000 * validityDropDownSelect)), () {
+      completeSession(model);
     });
   }
   
-  void completeSession () {
+  void completeSession (model) {
+    model.setSessionId(sessionId);
     GraphQLProvider.of(context).value.mutate(MutationOptions(document: """
       mutation completeSession(\$sessionId: String!){
         completeSession(sessionId: \$sessionId) {
@@ -119,15 +117,15 @@ class _CreateSessionState extends State<CreateSession> {
       }
     """, variables: <String, dynamic> {
       "sessionId": sessionId
-    })).then((res) => {
-      print(res)
+    }),).then((res) => {
+      Navigator.pushNamed(context, '/session')
     });
   }
 
   void showInSnackBar(String value) {
     FocusScope.of(context).requestFocus(new FocusNode());
     _sessionScaffoldKey.currentState?.removeCurrentSnackBar();
-    _sessionScaffoldKey.currentState.showSnackBar(new SnackBar(
+    _sessionScaffoldKey.currentState.showSnackBar(SnackBar(
       content: new Text(
         value,
         textAlign: TextAlign.center,
@@ -149,16 +147,16 @@ class _CreateSessionState extends State<CreateSession> {
 
   var now = new DateTime.now();
 
-  List <DropdownMenuItem<int>> listDrop = [];
-  List <DropdownMenuItem<int>> validityDrop = [DropdownMenuItem(child: Text('1min'), value: 1,), DropdownMenuItem(child: Text('2min'), value: 2,), DropdownMenuItem(child: Text('5min'), value: 5,), DropdownMenuItem(child: Text('10min'), value: 10,)];
+  List <DropdownMenuItem<int>> incDropList = [];
+  List <DropdownMenuItem<int>> validityDropList = [DropdownMenuItem(child: Text('1min'), value: 1,), DropdownMenuItem(child: Text('2min'), value: 2,), DropdownMenuItem(child: Text('5min'), value: 5,), DropdownMenuItem(child: Text('10min'), value: 10,)];
 
   void loadDropDown () {
-    listDrop = [];
-    listDrop.add(DropdownMenuItem(child: Text('1hr'), value: 1,));
-    listDrop.add(DropdownMenuItem(child: Text('2hr'), value: 2,));
-    listDrop.add(DropdownMenuItem(child: Text('3hr'), value: 3,));
-    listDrop.add(DropdownMenuItem(child: Text('4hr'), value: 4,));
-    listDrop.add(DropdownMenuItem(child: Text('5hr'), value: 5,));
+    incDropList = [];
+    incDropList.add(DropdownMenuItem(child: Text('1hr'), value: 1,));
+    incDropList.add(DropdownMenuItem(child: Text('2hr'), value: 2,));
+    incDropList.add(DropdownMenuItem(child: Text('3hr'), value: 3,));
+    incDropList.add(DropdownMenuItem(child: Text('4hr'), value: 4,));
+    incDropList.add(DropdownMenuItem(child: Text('5hr'), value: 5,));
   }
 
   final GlobalKey<ScaffoldState> _sessionScaffoldKey = new GlobalKey<ScaffoldState>();
@@ -167,7 +165,6 @@ class _CreateSessionState extends State<CreateSession> {
   Widget build(BuildContext context) {
     // TODO: implement build
     loadDropDown();
-
     return Scaffold(
       key: _sessionScaffoldKey,
         body: ScopedModelDescendant<AppModel>(
@@ -194,8 +191,8 @@ class _CreateSessionState extends State<CreateSession> {
                   children: <Widget>[
                     Text('For hours: '),
                     DropdownButton(
-                        value: dropDownSelect,
-                        items: listDrop,
+                        value: incDropDownSelect,
+                        items: incDropList,
                         hint: Text('Select'),
                         onChanged: (value) => {selectDropDown(value)}
                     )
@@ -209,7 +206,7 @@ class _CreateSessionState extends State<CreateSession> {
                     Text('Allow till: '),
                     DropdownButton(
                         value: validityDropDownSelect,
-                        items: validityDrop,
+                        items: validityDropList,
                         hint: Text('Select'),
                         onChanged: (value) => {selectValidityDropDown(value)}
                     )
@@ -259,7 +256,7 @@ class _CreateSessionState extends State<CreateSession> {
 
   void selectDropDown (value) {
     setState(() {
-      dropDownSelect = value;
+      incDropDownSelect = value;
     });
   }
 
