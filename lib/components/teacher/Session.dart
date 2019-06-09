@@ -9,6 +9,7 @@ class Session extends StatefulWidget {
 }
 
 class _SessionState extends State<Session> {
+  bool present = true;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -70,12 +71,21 @@ class _SessionState extends State<Session> {
                                         ],
                                       ),
                                       Material (
-                                          color: Colors.red,
+                                          color: Colors.transparent,
                                           borderRadius: BorderRadius.circular(24.0),
                                           child: Center (
                                               child: Padding (
                                                 padding: EdgeInsets.all(16.0),
-                                                child: Icon(Icons.add, color: Colors.white, size: 30.0),
+                                                child: Switch(
+                                                           value: present,
+                                                           onChanged: (value) {
+                                                                        setState(() {
+                                                                                      present = value;
+                                                                                    });
+                                                                              },
+                                                           activeTrackColor: Colors.blueAccent, 
+                                                           activeColor: Colors.blue,
+),
                                               )
                                           )
                                       )
