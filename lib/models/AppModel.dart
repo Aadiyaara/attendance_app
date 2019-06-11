@@ -8,6 +8,9 @@ class AppModel extends Model {
   String _courseCode;
   String _courseName;
   int _courseStrength;
+  int _courseYear;
+  String _courseBranch;
+  String _courseGroup;
 
   String _sessionId;
 
@@ -18,6 +21,9 @@ class AppModel extends Model {
   String get courseCode => _courseCode;
   String get courseName => _courseName;
   int get courseStrength => _courseStrength;
+  int get courseYear => _courseYear;
+  String get courseBranch => _courseBranch;
+  String get courseGroup => _courseGroup;
 
   String get sessionId => _sessionId;
 
@@ -50,6 +56,21 @@ class AppModel extends Model {
 
   void setCourseStrength(int t) {
     _courseStrength = t;
+    notifyListeners();
+  }
+
+  void setCourseYear(int t) {
+    _courseYear = t;
+    notifyListeners();
+  }
+
+  void setCourseBranch(String t) {
+    _courseBranch = t;
+    notifyListeners();
+  }
+
+  void setCourseGroup(String t) {
+    _courseGroup = t;
     notifyListeners();
   }
 

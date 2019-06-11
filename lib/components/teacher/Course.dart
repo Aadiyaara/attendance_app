@@ -87,7 +87,6 @@ class Course extends StatelessWidget {
                                     Text('${sessions[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
                                     Text('Attendance: ${sessions[index]["attendance"]}', style: TextStyle(color: Colors.redAccent)),
                                     SafeArea(child: Text('Date Created: ${sessions[index]["dateCreated"]}'.split('GMT')[0], style: TextStyle(color: Colors.redAccent))),
-                                    Text('ID: ${sessions[index]["_id"]}', style: TextStyle(color: Colors.redAccent)),
                                     Text('Token: ${sessions[index]["sessionToken"]}', style: TextStyle(color: Colors.redAccent)),
                                   ],
                                 ),

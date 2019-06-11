@@ -20,6 +20,8 @@ class _CreateSessionState extends State<CreateSession> {
     return preferences.getString(arg);
   }
 
+  bool timerSet = false;
+
   String sessionName;
 
   int incDropDownSelect = null;
@@ -66,6 +68,7 @@ class _CreateSessionState extends State<CreateSession> {
             token = resultData["createSession"]["sessionToken"];
             attendance = resultData["createSession"]["attendance"];
           });
+          timerSet = true;
           keepAsking(DateFormat("dd-MM-yyyy hh:mm:ss").format(now));
         }
       },
@@ -99,7 +102,7 @@ class _CreateSessionState extends State<CreateSession> {
     }
     runMutation({
       "courseToken": courseToken,
-      "name": DateFormat("dd-MM-yyyy hh:mm:ss").format(now),
+      "name": model.courseName,
       "incDelta": incDropDownSelect
     });
     Future.delayed(Duration(milliseconds: (60 * 1000 * validityDropDownSelect)), () {
@@ -161,6 +164,45 @@ class _CreateSessionState extends State<CreateSession> {
 
   final GlobalKey<ScaffoldState> _sessionScaffoldKey = new GlobalKey<ScaffoldState>();
 
+  Widget SessionOn() {
+    if(!timerSet) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          createSession(),
+          SizedBox(width: 2,height: 50,),
+          RaisedButton(
+            onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
+            child: Text('Go Back'),
+            color: Colors.blueAccent, //specify background color for the button here
+            colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
+            disabledColor: Colors.blueGrey, // specify color when the button is disabled
+            highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
+            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+          )
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Timer(duration: validityDropDownSelect),
+        RaisedButton(
+          onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
+          child: Text('Go Back'),
+          color: Colors.blueAccent, //specify background color for the button here
+          colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
+          disabledColor: Colors.blueGrey, // specify color when the button is disabled
+          highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
+          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -213,25 +255,9 @@ class _CreateSessionState extends State<CreateSession> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.only(top: 20.0)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    createSession(),
-                    SizedBox(width: 2,height: 50,),
-                    RaisedButton(
-                      onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
-                      child: Text('Go Back'),
-                      color: Colors.blueAccent, //specify background color for the button here
-                      colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
-                      disabledColor: Colors.blueGrey, // specify color when the button is disabled
-                      highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
-                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-                    )
-                  ],
-                ),
                 Expanded(
                   flex: 1,
-                  child: Container(),
+                  child: SessionOn()
                 ),
                 Container(
                   height: 150,

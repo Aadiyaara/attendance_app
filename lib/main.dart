@@ -5,14 +5,10 @@ import './components/teacher/Course.dart';
 import './components/teacher/Sessions.dart';
 import './components/teacher/Session.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import './components/student/join_course.dart';
-import 'workflow/pages/main_page.dart';
-import 'workflow/pages/ui/login_page.dart';
-import 'workflow/pages/ui/mark_att.dart';
+import './components/student/join_session.dart';
+import 'components/login_page.dart';
 import './components/teacher/create_course.dart';
 import './components/teacher/create_sess.dart';
-import './components/pedestal/interface.dart';
-import './components/student/student.dart';
 import 'package:scoped_model/scoped_model.dart';
 import './models/AppModel.dart';
 
@@ -61,7 +57,7 @@ class MyApp extends StatelessWidget {
           '/sessions': (BuildContext context)=> Sessions(),
           '/session': (BuildContext context)=> Session(),
           '/createSess': (BuildContext context)=> CreateSession(),
-          '/joinCourse': (BuildContext context)=> JoinCourse(),
+          '/joinSession': (BuildContext context)=> JoinSession(),
         },
         debugShowCheckedModeBanner: false,
       ),
