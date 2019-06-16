@@ -16,7 +16,8 @@ void main() => runApp(
     ScopedModel<AppModel>(
         model: AppModel(),
         child: ScopedModelDescendant<AppModel>(
-            builder: (context, child, model) => MyApp(token: model.token, id: model.id ))
+            builder: (context, child, model) => MyApp(token: model.token, id: model.id )
+        )
     )
 );
 

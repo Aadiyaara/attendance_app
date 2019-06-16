@@ -4,14 +4,14 @@ import 'dart:math' as math;
 class Timer extends StatefulWidget {
 
   final int duration;
-
-  const Timer({Key key, this.duration}): super(key: key);
+  final int progress;
+  const Timer({Key key, this.duration, this.progress}): super(key: key);
 
   @override
-  TimerState createState() => TimerState();
+  _TimerState createState() => _TimerState();
 }
 
-class TimerState extends State<Timer> with TickerProviderStateMixin {
+class _TimerState extends State<Timer> with TickerProviderStateMixin {
   AnimationController controller;
 
   @override
@@ -20,7 +20,12 @@ class TimerState extends State<Timer> with TickerProviderStateMixin {
       vsync: this,
       duration: Duration(seconds: widget.duration * 60),
     );
-    controller.forward(from: 0);
+    if (widget.progress == null) {
+      controller.forward(from: 0);
+    }
+    else {
+      controller.forward(from: widget.progress.toDouble()/600000);
+    }
     super.initState();
   }
 
@@ -36,11 +41,11 @@ class TimerState extends State<Timer> with TickerProviderStateMixin {
             animation: controller,
             builder: (BuildContext context, Widget child) {
               return CustomPaint(
-                  painter: TimerPainter(
-                    animation: controller,
-                    backgroundColor: Colors.blueGrey,
-                    color: Colors.red,
-                  )
+                painter: TimerPainter(
+                  animation: controller,
+                  backgroundColor: Colors.blueGrey,
+                  color: Colors.red,
+                )
               );
             },
           ),

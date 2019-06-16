@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../models/AppModel.dart';
 import 'package:intl/intl.dart';
-import './timer.dart';
+import 'package:attendance_app/utils/timer.dart';
 
 class CreateSession extends StatefulWidget {
   CreateSession({Key key}) : super(key: key);
