@@ -12,7 +12,7 @@ class _SessionState extends State<Session> {
   bool loadedPresent = false;
   bool inTransit = true;
   List sessionStudents;
-  List groupStudents;
+  List courseStudents;
   List absentees;
 
   List checkAbsent (checkStudents, sessionStudentsList) {
@@ -37,25 +37,23 @@ class _SessionState extends State<Session> {
     """, variables: <String, dynamic> {
       "sessionId": model.sessionId
     }, pollInterval: 1, fetchPolicy: FetchPolicy.noCache)).then((res) {
-      getGroupStudents(model, res.data["sessionStudents"]);
+      getCourseStudents(model, res.data["sessionStudents"]);
     });
   }
 
-  getGroupStudents (model, sessionStudentsList) {
+  getCourseStudents (model, sessionStudentsList) {
     GraphQLProvider.of(context).value.query(QueryOptions(document: """
-      query groupStudents ( \$year: Int!, \$branch: String!, \$group: String! ){
-        groupStudents (groupStudentsInput: { year: \$year, branch: \$branch, group: \$group }) {
+      query courseStudents ( \$courseId: String! ){
+        courseStudents (courseId: \$courseId) {
           _id
           name
         }
       }
       """, variables: <String, dynamic> {
-      "year": model.courseYear,
-      "branch": model.courseBranch,
-      "group": model.courseGroup
+      "courseId": model.courseId
     }, pollInterval: 1, fetchPolicy: FetchPolicy.noCache)).then((res) {
       setState(() {
-        absentees = checkAbsent(res.data["groupStudents"], sessionStudentsList);
+        absentees = checkAbsent(res.data["courseStudents"], sessionStudentsList);
         sessionStudents = sessionStudentsList;
       });
     });
@@ -211,16 +209,14 @@ class _SessionState extends State<Session> {
                       width: MediaQuery.of(context).size.width,
                       child: Container(
                         child: Query(options: QueryOptions(document: """
-                          query groupStudents ( \$year: Int!, \$branch: String!, \$group: String! ){
-                            groupStudents (groupStudentsInput: { year: \$year, branch: \$branch, group: \$group }) {
+                          query courseStudents ( \$courseId: String! ){
+                            courseStudents (courseId: \$courseId) {
                               _id
                               name
                             }
                           }
                           """, variables: <String, dynamic> {
-                            "year": model.courseYear,
-                            "branch": model.courseBranch,
-                            "group": model.courseGroup
+                            "courseId": model.courseId
                           }, pollInterval: 1, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
 
                           if(result.errors != null) {
@@ -238,11 +234,11 @@ class _SessionState extends State<Session> {
                             return Text('Loading');
                           }
 
-                          if(absentees != checkAbsent(result.data["groupStudents"], sessionStudents)) {
+                          if(absentees != checkAbsent(result.data["courseStudents"], sessionStudents)) {
                             print('Reloading absentess');
                             Future.delayed(Duration(milliseconds: (100)), () {
                               setState(() {
-                                absentees = checkAbsent(result.data["groupStudents"], sessionStudents);
+                                absentees = checkAbsent(result.data["courseStudents"], sessionStudents);
                               });
                             });
                           }
@@ -349,11 +345,6 @@ class _SessionState extends State<Session> {
         getSessionStudents(model);
       });
     }
-  }
-
-  goToSession (model, sessionId) {
-    model.setSessionId(sessionId);
-    Navigator.pushNamed(context, '/session');
   }
 }
 

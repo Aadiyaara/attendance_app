@@ -16,10 +16,18 @@ class _TimerState extends State<Timer> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: widget.duration * 60),
-    );
+    if(widget.progress == null) {
+      controller = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: widget.duration),
+      );
+    }
+    else {
+      controller = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: widget.duration * 60),
+      );
+    }
     if (widget.progress == null) {
       controller.forward(from: 0);
     }
