@@ -144,6 +144,8 @@ class _AttendanceState extends State<Attendance> {
   Widget Attendance (student) {
     List studentSessions = student["sessions"];
     if(studentSessions.length > 0) {
+      print('Check Main: ');
+      print(studentSessions);
       int timesPresent = getSessionNumbers(studentSessions);
       int courseSessionSum = 0;
       for(int i = 0 ; i < sessions.length; i++) {
@@ -169,12 +171,21 @@ class _AttendanceState extends State<Attendance> {
       for(int i = 0 ; i < sessions.length; i++) {
         courseSessionSum += sessions[i]["incDelta"];
       }
-      return Text(
-        '${((timesPresent / courseSessionSum)*100).floor()} %',
-        style: TextStyle(
-          color: Colors.white
-        )
-      );
+      if (timesPresent == 0 && courseSessionSum == 0) {
+        return Text('N.A.',
+            style: TextStyle(
+                color: Colors.white
+            )
+        );
+      }
+      else {
+        return Text(
+            '${((timesPresent / courseSessionSum)*100).floor()} %',
+            style: TextStyle(
+                color: Colors.white
+            )
+        );
+      }
     }
     else {
       return Text('N.A.',

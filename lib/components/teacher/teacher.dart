@@ -27,16 +27,6 @@ class Teacher extends StatefulWidget {
 
 class _TeacherState extends State<Teacher> {
 
-  final List<List<double>> charts = [
-    [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4],
-    [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4,],
-    [0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4, 0.0, 0.3, 0.7, 0.6, 0.55, 0.8, 1.2, 1.3, 1.35, 0.9, 1.5, 1.7, 1.8, 1.7, 1.2, 0.8, 1.9, 2.0, 2.2, 1.9, 2.2, 2.1, 2.0, 2.3, 2.4, 2.45, 2.6, 3.6, 2.6, 2.7, 2.9, 2.8, 3.4]
-  ];
-
-  static final List<String> chartDropdownItems = [ 'Last 7 days', 'Last month', 'Last year' ];
-  String actualDropdown = chartDropdownItems[0];
-  int actualChart = 0;
-
   Future<String> getTeacher (String arg) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences.getString(arg);
@@ -71,7 +61,7 @@ class _TeacherState extends State<Teacher> {
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(32.0),
                   child: InkWell (
-                    onTap: ()=>Navigator.pushNamed(context, '/create'),
+                    onTap: ()=>Navigator.pushReplacementNamed(context, '/create'),
                     child: Padding (
                       padding: EdgeInsets.all(12.0),
                       child: Row (
@@ -100,6 +90,7 @@ class _TeacherState extends State<Teacher> {
                     _id
                     name
                     year
+                    type
                     branch
                     group
                     code
@@ -107,7 +98,7 @@ class _TeacherState extends State<Teacher> {
                     strength
                   }
                 }
-                """, variables: <String, dynamic> {}, pollInterval: 100, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
+                """, variables: <String, dynamic> {}, pollInterval: 10, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
                       if(result.errors != null) {
                         return Center(
                           child: Text(result.errors.toString()),
@@ -170,7 +161,13 @@ class _TeacherState extends State<Teacher> {
                                                   crossAxisAlignment: CrossAxisAlignment.center,
                                                   children: <Widget>[
                                                     Text('${courses[index]['name']}', style: TextStyle(color: Colors.redAccent)),
-                                                    Text('${courses[index]['group']}', style: TextStyle(color: Colors.redAccent)),
+                                                    Row(children: <Widget>[
+                                                      Text('${courses[index]['group']}', style: TextStyle(color: Colors.redAccent)),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        child: Text('${courses[index]['type']}', style: TextStyle(color: Colors.redAccent)),
+                                                      )
+                                                    ],)
                                                   ],
                                                 )
                                               ],
@@ -242,10 +239,10 @@ class _TeacherState extends State<Teacher> {
     model.setCourseId(id);
     model.setCourseCode(code);
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => Attendance(courseCode: code, courseId: id)
-        )
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => Attendance(courseCode: code, courseId: id)
+      )
     );
   }
 

@@ -133,12 +133,7 @@ class _SessionState extends State<Session> {
 
                           List students = result.data["sessionStudents"];
                           if(sessionStudents != students) {
-                            print("Relaoding sessionStudents");
-                            Future.delayed(Duration(milliseconds: (100)), () {
-                              setState((){
-                                sessionStudents = students;
-                              });
-                            });
+                            sessionStudents = students;
                           }
 
                           print('sessionStudents: ${sessionStudents}');
@@ -173,7 +168,7 @@ class _SessionState extends State<Session> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget> [
-                                              Text('${sessionStudents[index]['name']}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
+                                              Text('${sessionStudents[index]['name']}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 14.0)),
                                               Text(
                                                 'RollNumber: ${sessionStudents[index]['rollNumber']}',
                                                 style: TextStyle(
@@ -244,16 +239,13 @@ class _SessionState extends State<Session> {
                           }
 
                           if(sessionStudents == null) {
-                            return Text('Loading');
+                            return Center(
+                              child: Text("Loading"),
+                            );
                           }
 
                           if(absentees != checkAbsent(result.data["courseStudents"], sessionStudents)) {
-                            print('Reloading absentess');
-                            Future.delayed(Duration(milliseconds: (100)), () {
-                              setState(() {
-                                absentees = checkAbsent(result.data["courseStudents"], sessionStudents);
-                              });
-                            });
+                            absentees = checkAbsent(result.data["courseStudents"], sessionStudents);
                           }
 
                           print('Absentees: ${absentees}');
@@ -288,7 +280,7 @@ class _SessionState extends State<Session> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: <Widget> [
-                                              Text('${absentees[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
+                                              Text('${absentees[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 15.0)),
                                               Text(
                                                   'RollNumber: ${absentees[index]['rollNumber']}',
                                                   style: TextStyle(

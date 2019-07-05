@@ -3,7 +3,27 @@ import 'package:scoped_model/scoped_model.dart';
 import '../../models/AppModel.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-class Course extends StatelessWidget {
+class Course extends StatefulWidget {
+
+  @override
+  _CourseState createState() => _CourseState();
+}
+
+class _CourseState extends State<Course> {
+
+  deleteSession (String sessionId) {
+    GraphQLProvider.of(context).value.mutate(MutationOptions(document: """
+        mutation deleteSession(\$sessionId: String!){
+          deleteSession(sessionId: \$sessionId)
+        } 
+    """, variables: <String, dynamic> {
+      "sessionId": sessionId
+    }, fetchPolicy: FetchPolicy.noCache)).then((res) {
+      print(res.data);
+      Navigator.pop(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -27,7 +47,6 @@ class Course extends StatelessWidget {
                   Text("Course Name: ${model.courseName}"),
                   Text("Course Code: ${model.courseCode}"),
                   Text("Course Token: ${model.courseToken}"),
-                  Text("Course Strength: ${model.courseStrength}"),
                 ],
               ),
             ),
@@ -48,7 +67,7 @@ class Course extends StatelessWidget {
                 }
                 """, variables: <String, dynamic> {
                   "courseId": model.courseId
-                }, pollInterval: 100, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
+                }, pollInterval: 5, fetchPolicy: FetchPolicy.noCache), builder: (QueryResult result, {VoidCallback refetch}) {
                 if(result.errors != null) {
                   return Center(
                     child: Text(result.errors.toString()),
@@ -74,6 +93,7 @@ class Course extends StatelessWidget {
                         child: InkWell(
                           // Do onTap() if it isn't null, otherwise do print()
                           onTap: () => { goToSession(model, sessions[index]["_id"], context) },
+                          onLongPress: () => { createAlertDialog(context, 'Confirmation?', 'Are you sure you want to delete this session?', sessions[index]['_id']) },
                           child: Padding (
                             padding: const EdgeInsets.all(24.0),
                             child: Row (
@@ -84,7 +104,7 @@ class Course extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget> [
-                                    Text('${sessions[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 34.0)),
+                                    Text('${sessions[index]["name"]}', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 15.0)),
                                     Text('Attendance: ${sessions[index]["attendance"]}', style: TextStyle(color: Colors.redAccent)),
                                     SafeArea(child: Text('Date Created: ${sessions[index]["dateCreated"]}'.split('GMT')[0], style: TextStyle(color: Colors.redAccent))),
                                     Text('Token: ${sessions[index]["sessionToken"]}', style: TextStyle(color: Colors.redAccent)),
@@ -115,6 +135,23 @@ class Course extends StatelessWidget {
       ),
     ))
   );
+  }
+
+  createAlertDialog (BuildContext context, String title, String content, String sessionId) {
+    return showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              deleteSession(sessionId);
+            },
+            child: Text('Delete Session')
+          )
+        ],
+      );
+    });
   }
 
   goToSession (model, sessionId, context) {

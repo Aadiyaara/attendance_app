@@ -24,6 +24,8 @@ class _CreateSessionState extends State<CreateSession> {
 
   String sessionName;
 
+  bool showCreate = true;
+
   int incDropDownSelect = null;
 
   String sessionId;
@@ -32,9 +34,10 @@ class _CreateSessionState extends State<CreateSession> {
 
   TextEditingController validityController = new TextEditingController();
 
-  Mutation createSession() {
-    return Mutation(
-      options: MutationOptions(document: """
+  createSession() {
+    if(showCreate) {
+      return Mutation(
+        options: MutationOptions(document: """
         mutation createSession(\$courseToken: String!, \$name: String!, \$incDelta: Int!){
           createSession(sessionInput: {courseToken: \$courseToken ,name: \$name, incDelta: \$incDelta}) {
             _id
@@ -43,57 +46,50 @@ class _CreateSessionState extends State<CreateSession> {
           }
         }
       """),
-      builder: (
-          RunMutation runMutation,
-          QueryResult result,
-          ) {
-        return ScopedModelDescendant<AppModel>(
-            builder: (context, child, model) => RaisedButton(
-          onPressed: () => createNewSession(runMutation, model.courseToken, model),
-          child: Text('Create'),
-          color: Colors.pink, //specify background color for the button here
-          colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
-          disabledColor: Colors.blueGrey, // specify color when the button is disabled
-          highlightColor: Colors.red, //color when the button is being actively pressed, quickly fills the button and fades out after
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-          )
-        );
-      },
-      onCompleted: (dynamic resultData) async {
-        if (resultData == null) {
-          print(resultData);
-        } else {
-          print (resultData["createSession"]["sessionToken"]);
-          setState((){
-            sessionId = resultData["createSession"]["_id"];
-            token = resultData["createSession"]["sessionToken"];
-            attendance = resultData["createSession"]["attendance"];
-          });
-          timerSet = true;
-          keepAsking(DateFormat("dd-MM-yyyy hh:mm:ss").format(now));
-        }
-      },
-    );
-  }
+        builder: (RunMutation runMutation,
+            QueryResult result,) {
+          return ScopedModelDescendant<AppModel>(
+              builder: (context, child, model) =>
+                  RaisedButton(
+                    onPressed: () {
+                      setState(() {
+                        showCreate = false;
+                      });
+                      createNewSession(runMutation, model.courseToken, model);
+                    },
+                    child: Text('Create'),
+                    color: Colors.pink,
+                    //specify background color for the button here
+                    colorBrightness: Brightness.dark,
+                    //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
+                    disabledColor: Colors.blueGrey,
+                    // specify color when the button is disabled
+                    highlightColor: Colors.red,
+                    //color when the button is being actively pressed, quickly fills the button and fades out after
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 5.0),
+                  )
+          );
+        },
+        onCompleted: (dynamic resultData) async {
+          if (resultData == null) {
+            print(resultData);
+          } else {
+            print(resultData["createSession"]["sessionToken"]);
+            setState(() {
+              sessionId = resultData["createSession"]["_id"];
+              token = resultData["createSession"]["sessionToken"];
+              attendance = resultData["createSession"]["attendance"];
+            });
+            timerSet = true;
+          }
+        },
+      );
+    }
+    else {
+      return Text('Creating');
+    }
 
-  void keepAsking(String name) async{
-    await GraphQLProvider.of(context).value.query(QueryOptions(document: """
-      query teacherSession(\$name: String!){
-        teacherSession(name: \$name) {
-          attendance
-        }
-      }
-      """, variables: <String, dynamic> {
-        "name": name
-      }, pollInterval: 100, fetchPolicy: FetchPolicy.noCache)
-    ).then((res) => {
-      setState(() {
-        attendance = res.data["teacherSession"]["attendance"];
-      })
-    });
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      keepAsking(name);
-    });
   }
 
   void createNewSession (runMutation, courseToken, model) {
@@ -179,9 +175,12 @@ class _CreateSessionState extends State<CreateSession> {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           createSession(),
-          SizedBox(width: 2,height: 50,),
+          SizedBox(
+            width: 2,
+            height: 50,
+          ),
           RaisedButton(
-            onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
+            onPressed: () => Navigator.pop(context),
             child: Text('Go Back'),
             color: Colors.blueAccent, //specify background color for the button here
             colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light
@@ -199,7 +198,7 @@ class _CreateSessionState extends State<CreateSession> {
       children: <Widget>[
         Timer(duration: int.parse(validityController.text)),
         RaisedButton(
-          onPressed: () => Navigator.popAndPushNamed(context, '/teacher'),
+          onPressed: () => Navigator.pop(context),
           child: Text('Go Back'),
           color: Colors.blueAccent, //specify background color for the button here
           colorBrightness: Brightness.dark, //specify the color brightness here, either `Brightness.dark` for darl and `Brightness.light` for light

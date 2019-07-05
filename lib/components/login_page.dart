@@ -8,6 +8,7 @@ import '../models/AppModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -26,6 +27,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   bool matchingPassword = false;
   bool invalidDialogAllowed = true;
 
+  String verificationId;
+  String smsCode;
+
+  bool phoneVerified = false;
   bool isLoading = false;
 
   String _mode = "Teacher";
@@ -342,7 +347,25 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
 
+  isVerifiedByPhone () {
+    if(!phoneVerified) {
+      return RaisedButton(
+        onPressed: verifyPhone,
+        child: Text('Verify'),
+      );
+    }
+    else {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: Text('Verified'),
+      );
+    }
+  }
+
   Widget StudentDetails () {
+    if(_mode == 'Teacher') {
+      return Container();
+    }
     return Container(
       padding: EdgeInsets.only(top: 120.0),
       child: Column(
@@ -465,7 +488,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         ),
                         Padding(
                           padding: EdgeInsets.only(
-                              top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                              top: 20.0, bottom: 5.0, left: 25.0, right: 25.0),
                           child: TextFormField(
                             focusNode: studentSignUpPhoneNumberFocusNode,
                             keyboardType: TextInputType.number,
@@ -489,13 +512,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ),
                           ),
                         ),
+                        isVerifiedByPhone(),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                        )
                       ],
                     ),
                   )
                 )
               ),
               Container(
-                margin: EdgeInsets.only(top: 420.0),
+                margin: EdgeInsets.only(top: 475.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
@@ -698,6 +725,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildMenuBar(BuildContext context) {
+    if(_mode=='Teacher') {
+      return Padding(
+        padding: EdgeInsets.only(top: 120)
+      );
+    }
     return Column(
       children: <Widget>[
         Container(
@@ -899,6 +931,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildSignUp(BuildContext context) {
+    if(_mode == 'Teacher') {
+      return Container();
+    }
     return Container(
       padding: EdgeInsets.only(top: 23.0),
       child: Column(
@@ -1103,6 +1138,98 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> verifyPhone() async {
+    
+    if(signupPhoneController.text.length != 10) {
+      showInSnackBar('Enter 10 Digit Phone Number');
+      return;
+    }
+
+    final PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String verId) {
+      this.verificationId = verId;
+    };
+
+    final PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResend]) {
+      this.verificationId = verId;
+      print('ID TEST');
+      print(verificationId);
+      smsCodeDialog(context).then((value) {
+        print('Phone Verified!');
+      });
+    };
+
+    final PhoneVerificationCompleted veriSuccess = (user) {
+      print('Success ${user}');
+      setState(() {
+        phoneVerified = true;
+      });
+      Navigator.pop(context);
+    };
+
+    final PhoneVerificationFailed veriFailed = (AuthException exception) {
+      print('Failed Phone Verification: ${exception.message}');
+    };
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '+91' + signupPhoneController.text,
+        timeout: const Duration(seconds: 15),
+        verificationCompleted: veriSuccess,
+        verificationFailed: veriFailed,
+        codeSent: smsCodeSent,
+        codeAutoRetrievalTimeout: autoRetrievalTimeout
+    ).catchError(() {
+      showInSnackBar('Invalid');
+    });
+  }
+
+  Future<bool> smsCodeDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter SMS Code OTP'),
+          content: TextField(
+            onChanged: (value) {
+              this.smsCode = value;
+            },
+          ),
+          contentPadding: EdgeInsets.all(5.0),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                FirebaseAuth.instance.currentUser().then((user) {
+                  if(user != null) {
+                    Navigator.of(context).pop();
+                    print('!=null');
+                    showInSnackBar('Invalid OTP');
+                  }
+                  else {
+                    print('null');
+                    final AuthCredential credential = PhoneAuthProvider.getCredential(
+                      verificationId: verificationId,
+                      smsCode: smsCode,
+                    );
+                    FirebaseAuth.instance.signInWithCredential(credential).then((res) {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        phoneVerified = true;
+                      });
+                    }).catchError(() {
+                      Navigator.pop(context);
+                      showInSnackBar('Invalid');
+                    });
+                  }
+                });
+              },
+              child: Text('Submit')
+            )
+          ],
+        );
+      }
     );
   }
 
@@ -1361,6 +1488,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           showInSnackBar("Insufficient Details");
           return;
         }
+        else if (!phoneVerified) {
+          showInSnackBar('Must Verify phone first');
+          return;
+        }
         runMutation({
           "name": signupNameController.text,
           "email": signupEmailController.text,
@@ -1389,13 +1520,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   void _onTeacherButtonPress() {
-    _mode = "Teacher";
+    setState(() {
+      _mode = "Teacher";
+    });
     flowController.animateToPage(1, duration: Duration(milliseconds: 750), curve: Curves.decelerate);
 
   }
 
   void _onStudentButtonPress() {
-    _mode = "Student";
+    setState(() {
+      _mode = "Student";
+    });
     flowController?.animateToPage(1, duration: Duration(milliseconds: 750), curve: Curves.decelerate);
   }
 

@@ -74,6 +74,10 @@ class _CreateCourseState extends State<CreateCourse> {
         branchDropList.add(DropdownMenuItem(child: Text('N'), value: 'N',));
         branchDropList.add(DropdownMenuItem(child: Text('O'), value: 'O',));
         branchDropList.add(DropdownMenuItem(child: Text('P'), value: 'P',));
+        branchDropList.add(DropdownMenuItem(child: Text('Q'), value: 'Q',));
+        branchDropList.add(DropdownMenuItem(child: Text('R'), value: 'R',));
+        branchDropList.add(DropdownMenuItem(child: Text('S'), value: 'S',));
+        branchDropList.add(DropdownMenuItem(child: Text('T'), value: 'T',));
       }
       else if(_year == 2) {
         branchDropList.add(DropdownMenuItem(child: Text('COE'), value: 'COE',));
