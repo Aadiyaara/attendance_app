@@ -69,7 +69,7 @@ class _StudentState extends State<Student> with WidgetsBindingObserver {
         }
       }
     }
-  """,  pollInterval: 1000, fetchPolicy: FetchPolicy.noCache);
+  """,  pollInterval: 10, fetchPolicy: FetchPolicy.noCache);
 
 
   QueryOptions sessionOptions = QueryOptions(document: """
@@ -79,7 +79,7 @@ class _StudentState extends State<Student> with WidgetsBindingObserver {
           incDelta
         }
       }
-  """, pollInterval: 1000, fetchPolicy: FetchPolicy.noCache);
+  """, pollInterval: 10, fetchPolicy: FetchPolicy.noCache);
 
 //  Try to dissolve into the Widgets
   getStudentDetails () {

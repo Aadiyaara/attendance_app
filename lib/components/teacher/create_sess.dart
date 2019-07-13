@@ -191,6 +191,7 @@ class _CreateSessionState extends State<CreateSession> {
         ],
       );
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
@@ -280,7 +281,6 @@ class _CreateSessionState extends State<CreateSession> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text("Code: ${token}"),
-                      Text("Attendance: ${attendance}"),
                     ],
                   ),
                 )

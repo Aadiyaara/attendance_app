@@ -624,6 +624,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     tileMode: TileMode.clamp),
                 ),
                 child: PageView(
+                  physics: NeverScrollableScrollPhysics(),
                   controller: flowController,
                   children: <Widget>[
                     TypeSelector(),
